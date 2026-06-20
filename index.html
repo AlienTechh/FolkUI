@@ -159,8 +159,6 @@
             cursor: pointer;
         }
 
-        #settings-trigger { grid-column: 1; }
-
         .app-icon {
             width: 48px;
             height: 48px;
@@ -169,7 +167,14 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+        }
+
+        #settings-trigger .app-icon {
             background: #e3e3e4;
+        }
+
+        #app2-trigger .app-icon {
+            background: #a8c7fa;
         }
 
         .app-icon svg {
@@ -183,9 +188,10 @@
             font-size: 10px;
             margin-top: 6px;
             text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            text-align: center;
         }
 
-        /* Settings App Window */
+        /* App Window Base Styles */
         .app-window {
             position: absolute;
             top: 0;
@@ -387,10 +393,19 @@
                     <div class="app-icon-wrapper" id="settings-trigger">
                         <div class="app-icon" id="target-icon">
                             <svg viewBox="0 0 24 24">
-                                <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73(1.69-.98l.38-2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3-1.57-3-3.5s1.07-3.5 3-3.5 3 1.57 3 3.5-1.07 3.5-3 3.5z"/>
+                                <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38-2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3-1.57-3-3.5s1.07-3.5 3-3.5 3 1.57 3 3.5-1.07 3.5-3 3.5z"/>
                             </svg>
                         </div>
                         <div class="app-label">Settings</div>
+                    </div>
+
+                    <div class="app-icon-wrapper" id="app2-trigger">
+                        <div class="app-icon" id="app2-icon">
+                            <svg viewBox="0 0 24 24">
+                                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
+                            </svg>
+                        </div>
+                        <div class="app-label">App2</div>
                     </div>
                 </div>
             </div>
@@ -451,6 +466,11 @@
                 </div>
             </div>
 
+            <div class="app-window" id="app2-app">
+                <div class="app-content">
+                    </div>
+            </div>
+
             <div class="nav-bar" id="nav-bar">
                 <div class="gesture-line" id="gesture-line"></div>
             </div>
@@ -461,8 +481,11 @@
     <script>
         const screen = document.getElementById('screen');
         const targetIcon = document.getElementById('target-icon');
+        const app2Icon = document.getElementById('app2-icon');
         const settingsTrigger = document.getElementById('settings-trigger');
+        const app2Trigger = document.getElementById('app2-trigger');
         const settingsApp = document.getElementById('settings-app');
+        const app2App = document.getElementById('app2-app');
         const navBar = document.getElementById('nav-bar');
         const gestureLine = document.getElementById('gesture-line');
         const statusClock = document.getElementById('status-clock');
@@ -472,9 +495,11 @@
         const soundToggle = document.getElementById('sound-toggle');
         const soundStatus = document.getElementById('sound-status');
 
-        let isSettingsOpen = false;
+        let activeApp = null;
+        let isAppOpen = false;
         let startY = 0, currentY = 0, isDragging = false;
-        let iconTransformState = "";
+        let settingsTransformState = "";
+        let app2TransformState = "";
 
         // Status Bar Clock Engine
         function updateClock() {
@@ -486,7 +511,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Feature Text Rows: Click Handlers Dedicated to Features
+        // Feature Text Rows
         document.getElementById('net-item').addEventListener('click', () => {
             alert('Searching for nearby Wi-Fi networks...');
         });
@@ -501,9 +526,11 @@
         darkThemeToggle.addEventListener('change', (e) => {
             if (e.target.checked) {
                 settingsApp.classList.add('dark-theme');
+                app2App.classList.add('dark-theme');
                 screen.classList.add('dark-active');
             } else {
                 settingsApp.classList.remove('dark-theme');
+                app2App.classList.remove('dark-theme');
                 screen.classList.remove('dark-active');
             }
         });
@@ -516,42 +543,62 @@
         // Live Filtering
         searchBar.addEventListener('input', (e) => {
             const query = e.target.value.toLowerCase();
-            document.querySelectorAll('.settings-item').forEach(item => {
+            document.querySelectorAll('#settings-app .settings-item').forEach(item => {
                 const text = item.querySelector('.settings-item-text').textContent.toLowerCase();
                 item.style.display = text.includes(query) ? 'flex' : 'none';
             });
         });
 
-        // Matrix Coordinate Transforms
-        function setWindowToIconPosition() {
-            const iconRect = targetIcon.getBoundingClientRect();
+        // Matrix Coordinate Transforms Setup
+        function setAppWindowPositions() {
             const screenRect = screen.getBoundingClientRect();
+
+            // Settings transform
+            const iconRect = targetIcon.getBoundingClientRect();
             const localLeft = iconRect.left - screenRect.left;
             const localTop = iconRect.top - screenRect.top;
             const scaleX = iconRect.width / screenRect.width;
             const scaleY = iconRect.height / screenRect.height;
-
-            iconTransformState = `translate(${localLeft}px, ${localTop}px) scale(${scaleX}, ${scaleY})`;
-            if (!isSettingsOpen) {
-                settingsApp.style.transform = iconTransformState;
+            settingsTransformState = `translate(${localLeft}px, ${localTop}px) scale(${scaleX}, ${scaleY})`;
+            
+            if (!isAppOpen || activeApp !== settingsApp) {
+                settingsApp.style.transform = settingsTransformState;
                 settingsApp.style.borderRadius = "12px";
             }
+
+            // App2 transform
+            const app2Rect = app2Icon.getBoundingClientRect();
+            const app2LocalLeft = app2Rect.left - screenRect.left;
+            const app2LocalTop = app2Rect.top - screenRect.top;
+            const app2ScaleX = app2Rect.width / screenRect.width;
+            const app2ScaleY = app2Rect.height / screenRect.height;
+            app2TransformState = `translate(${app2LocalLeft}px, ${app2LocalTop}px) scale(${app2ScaleX}, ${app2ScaleY})`;
+
+            if (!isAppOpen || activeApp !== app2App) {
+                app2App.style.transform = app2TransformState;
+                app2App.style.borderRadius = "12px";
+            }
         }
-        setWindowToIconPosition();
-        window.addEventListener('resize', setWindowToIconPosition);
+        
+        setTimeout(setAppWindowPositions, 100);
+        window.addEventListener('resize', setAppWindowPositions);
 
-        // Open App
-        settingsTrigger.addEventListener('click', () => {
-            setWindowToIconPosition();
-            settingsApp.getBoundingClientRect(); 
-            isSettingsOpen = true;
+        // Open App Controllers
+        settingsTrigger.addEventListener('click', () => openApp(settingsApp));
+        app2Trigger.addEventListener('click', () => openApp(app2App));
+
+        function openApp(appTarget) {
+            setAppWindowPositions();
+            appTarget.getBoundingClientRect(); 
+            activeApp = appTarget;
+            isAppOpen = true;
             screen.classList.add('app-open');
-            settingsApp.classList.add('open');
-        });
+            appTarget.classList.add('open');
+        }
 
-        // STRICT GESTURE ENGINE: ONLY DETECTS UPWARD VELOCITY FROM THE BOTTOM BAR
+        // GESTURE ENGINE
         navBar.addEventListener('touchstart', (e) => { 
-            if (isSettingsOpen) { 
+            if (isAppOpen) { 
                 startY = e.touches[0].clientY; 
                 currentY = startY; 
                 initDrag(); 
@@ -567,8 +614,8 @@
                     if (e.cancelable) e.preventDefault();
                     let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
                     let radiusFactor = Math.min(38, 28 + (deltaY / 12));
-                    settingsApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
-                    settingsApp.style.borderRadius = `${radiusFactor}px`;
+                    activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
+                    activeApp.style.borderRadius = `${radiusFactor}px`;
                     gestureLine.style.transform = `translateY(${-deltaY * 0.25}px)`;
                 }
             } 
@@ -577,21 +624,21 @@
         navBar.addEventListener('touchend', () => { 
             if (isDragging) {
                 isDragging = false;
-                settingsApp.classList.remove('dragging');
+                activeApp.classList.remove('dragging');
                 let deltaY = startY - currentY;
                 
                 if (deltaY > 75) { 
-                    closeSettingsApp(); 
+                    closeActiveApp(); 
                 } else {
-                    settingsApp.style.transform = '';
-                    settingsApp.style.borderRadius = '';
+                    activeApp.style.transform = '';
+                    activeApp.style.borderRadius = '';
                     gestureLine.style.transform = '';
                 }
             }
         });
         
         navBar.addEventListener('mousedown', (e) => {
-            if (!isSettingsOpen) return;
+            if (!isAppOpen) return;
             startY = e.clientY; 
             currentY = startY;
             initDrag();
@@ -601,7 +648,7 @@
                 let deltaY = startY - currentY;
                 if (deltaY > 0) {
                     let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
-                    settingsApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
+                    activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
                 }
             };
             
@@ -609,27 +656,30 @@
                 document.onmousemove = null; 
                 document.onmouseup = null; 
                 isDragging = false;
-                settingsApp.classList.remove('dragging');
+                activeApp.classList.remove('dragging');
                 if ((startY - currentY) > 75) { 
-                    closeSettingsApp(); 
+                    closeActiveApp(); 
                 } else {
-                    settingsApp.style.transform = '';
+                    activeApp.style.transform = '';
                 }
             };
         });
 
-        function initDrag() { isDragging = true; settingsApp.classList.add('dragging'); }
+        function initDrag() { isDragging = true; activeApp.classList.add('dragging'); }
 
-        function closeSettingsApp() {
-            isSettingsOpen = false;
+        function closeActiveApp() {
+            isAppOpen = false;
             screen.classList.remove('app-open');
-            settingsApp.classList.remove('open');
+            activeApp.classList.remove('open');
+            
             searchBar.value = '';
             searchBar.blur();
-            document.querySelectorAll('.settings-item').forEach(i => i.style.display = 'flex');
-            settingsApp.style.transform = iconTransformState;
-            settingsApp.style.borderRadius = "12px";
+            document.querySelectorAll('#settings-app .settings-item').forEach(i => i.style.display = 'flex');
+            
+            activeApp.style.transform = (activeApp === settingsApp) ? settingsTransformState : app2TransformState;
+            activeApp.style.borderRadius = "12px";
             gestureLine.style.transform = '';
+            activeApp = null;
         }
     </script>
 </body>
