@@ -65,7 +65,7 @@
             overflow: hidden;
         }
 
-        /* Camera Punch Hole - Shifted UP and made BIGGER */
+        /* Camera Punch Hole */
         .camera {
             position: absolute;
             top: 16px;
@@ -126,7 +126,6 @@
             transition: transform 0.2s ease, opacity 0.2s ease;
         }
 
-        /* Default starting positions on the workspace canvas */
         #settings-trigger { left: 10px; top: 20px; }
         #app2-trigger { left: 85px; top: 20px; }
 
@@ -154,7 +153,6 @@
             background-position: center;
         }
 
-        /* custom PNG image asset integration */
         #settings-trigger .app-icon {
             background-image: url('https://static.wikia.nocookie.net/logopedia/images/2/27/Settings_android-8.png/revision/latest?cb=20240930165358');
             background-color: transparent;
@@ -250,11 +248,10 @@
 
         .app-window.dragging { transition: none !important; }
 
-        /* Hidden Scrollbars Custom View Canvas */
         .app-content {
             width: 100%;
             height: 100%;
-            padding: 55px 16px 40px 16px;
+            padding: 55px 16px 45px 16px;
             display: flex;
             flex-direction: column;
             gap: 16px;
@@ -265,7 +262,6 @@
         }
 
         .app-content::-webkit-scrollbar { display: none; }
-        .app-content { -ms-overflow-style: none; scrollbar-width: none; }
 
         .app-window.open .app-content {
             opacity: 1;
@@ -289,8 +285,6 @@
             font-size: 14px;
             color: var(--text-color);
             outline: none;
-            -webkit-user-select: text;
-            user-select: text;
         }
 
         .settings-list { display: flex; flex-direction: column; }
@@ -338,7 +332,6 @@
             margin-top: 1px;
         }
 
-        /* Switch components */
         .switch {
             position: relative;
             display: inline-block;
@@ -367,29 +360,30 @@
         input:checked + .slider { background-color: #a8c7fa; }
         input:checked + .slider:before { transform: translateX(16px); background-color: #0b57d0; }
 
-        /* Navigation Bar & Gesture Area */
+        /* Enhanced Mobile Target Gesture Navigation Zone */
         .nav-bar {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 32px;
+            height: 40px;
             z-index: 140;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-end;
+            padding-bottom: 8px;
             cursor: grab;
             background: transparent;
         }
         .nav-bar:active { cursor: grabbing; }
 
         .gesture-line {
-            width: 60px;
+            width: 65px;
             height: 4px;
             background: rgba(255, 255, 255, 0.8);
             border-radius: 2px;
             will-change: transform;
-            transition: background 0.3s, transform 0.2s ease-out;
+            transition: background 0.3s, transform 0.15s ease-out;
             pointer-events: none;
         }
 
@@ -435,12 +429,10 @@
             <div class="app-window" id="settings-app">
                 <div class="app-content">
                     <h1 class="settings-title">Settings</h1>
-                    
                     <div class="search-wrapper">
                         <input type="text" class="settings-search" id="search-bar" placeholder="Search settings..." autocomplete="off">
                     </div>
-                    
-                    <div class="settings-list" id="settings-list">
+                    <div class="settings-list">
                         <div class="settings-item">
                             <div class="settings-item-left" id="net-item">
                                 <div class="settings-item-icon">
@@ -452,7 +444,6 @@
                                 </div>
                             </div>
                         </div>
-                        
                         <div class="settings-item">
                             <div class="settings-item-left" id="dark-item">
                                 <div class="settings-item-icon">
@@ -468,7 +459,6 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
-
                         <div class="settings-item">
                             <div class="settings-item-left" id="sound-item">
                                 <div class="settings-item-icon">
@@ -513,7 +503,6 @@
         const navBar = document.getElementById('nav-bar');
         const gestureLine = document.getElementById('gesture-line');
         const statusClock = document.getElementById('status-clock');
-        
         const searchBar = document.getElementById('search-bar');
         const darkThemeToggle = document.getElementById('dark-theme-toggle');
         const soundToggle = document.getElementById('sound-toggle');
@@ -525,111 +514,62 @@
         let settingsTransformState = "";
         let app2TransformState = "";
 
-        // Status Bar Clock Engine
         function updateClock() {
             const now = new Date();
-            let hh = String(now.getHours()).padStart(2, '0');
-            let mm = String(now.getMinutes()).padStart(2, '0');
-            statusClock.textContent = `${hh}:${mm}`;
+            statusClock.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
         }
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Menu item links
-        document.getElementById('net-item').addEventListener('click', () => {
-            alert('Searching for nearby Wi-Fi networks...');
-        });
-        document.getElementById('dark-item').addEventListener('click', () => {
-            darkThemeToggle.click();
-        });
-        document.getElementById('sound-item').addEventListener('click', () => {
-            soundToggle.click();
-        });
-
-        // Dark Mode Logic
         darkThemeToggle.addEventListener('change', (e) => {
-            if (e.target.checked) {
-                settingsApp.classList.add('dark-theme');
-                app2App.classList.add('dark-theme');
-                screen.classList.add('dark-active');
-            } else {
-                settingsApp.classList.remove('dark-theme');
-                app2App.classList.remove('dark-theme');
-                screen.classList.remove('dark-active');
-            }
+            const act = e.target.checked ? 'add' : 'remove';
+            settingsApp.classList[act]('dark-theme');
+            app2App.classList[act]('dark-theme');
+            screen.classList[act]('dark-active');
         });
 
-        // Sound Sync Logic
         soundToggle.addEventListener('change', (e) => {
             soundStatus.textContent = e.target.checked ? "Ring volume at 80%" : "Muted / Vibrate only";
         });
 
-        // Live Filtering
-        searchBar.addEventListener('input', (e) => {
-            const query = e.target.value.toLowerCase();
-            document.querySelectorAll('#settings-app .settings-item').forEach(item => {
-                const text = item.querySelector('.settings-item-text').textContent.toLowerCase();
-                item.style.display = text.includes(query) ? 'flex' : 'none';
-            });
-        });
-
-        // Matrix Coordinate Transforms Setup
+        // Fixed Windows Layer Positions
         function setAppWindowPositions() {
+            if (isAppOpen) return;
             const screenRect = screen.getBoundingClientRect();
 
-            const iconRect = targetIcon.getBoundingClientRect();
-            const localLeft = iconRect.left - screenRect.left;
-            const localTop = iconRect.top - screenRect.top;
-            const scaleX = iconRect.width / screenRect.width;
-            const scaleY = iconRect.height / screenRect.height;
-            settingsTransformState = `translate(${localLeft}px, ${localTop}px) scale(${scaleX}, ${scaleY})`;
-            
-            if (!isAppOpen || activeApp !== settingsApp) {
-                settingsApp.style.transform = settingsTransformState;
-                settingsApp.style.borderRadius = "12px";
-            }
+            const r1 = targetIcon.getBoundingClientRect();
+            settingsTransformState = `translate(${r1.left - screenRect.left}px, ${r1.top - screenRect.top}px) scale(${r1.width / screenRect.width}, ${r1.height / screenRect.height})`;
+            if(activeApp !== settingsApp) { settingsApp.style.transform = settingsTransformState; settingsApp.style.borderRadius = "12px"; }
 
-            const app2Rect = app2Icon.getBoundingClientRect();
-            const app2LocalLeft = app2Rect.left - screenRect.left;
-            const app2LocalTop = app2Rect.top - screenRect.top;
-            const app2ScaleX = app2Rect.width / screenRect.width;
-            const app2ScaleY = app2Rect.height / screenRect.height;
-            app2TransformState = `translate(${app2LocalLeft}px, ${app2LocalTop}px) scale(${app2ScaleX}, ${app2ScaleY})`;
-
-            if (!isAppOpen || activeApp !== app2App) {
-                app2App.style.transform = app2TransformState;
-                app2App.style.borderRadius = "12px";
-            }
+            const r2 = app2Icon.getBoundingClientRect();
+            app2TransformState = `translate(${r2.left - screenRect.left}px, ${r2.top - screenRect.top}px) scale(${r2.width / screenRect.width}, ${r2.height / screenRect.height})`;
+            if(activeApp !== app2App) { app2App.style.transform = app2TransformState; app2App.style.borderRadius = "12px"; }
         }
-        
         setTimeout(setAppWindowPositions, 200);
         window.addEventListener('resize', setAppWindowPositions);
 
-        // Open App Logic
         function openApp(appTarget) {
-            if (isDraggingIcon) return; 
-            setAppWindowPositions();
-            appTarget.getBoundingClientRect(); 
+            if (isDraggingIcon || isAppOpen) return; 
             activeApp = appTarget;
             isAppOpen = true;
             screen.classList.add('app-open');
             appTarget.classList.add('open');
         }
 
-        // 0.50 Seconds Tap & Hold To Drag Engine Configuration
+        // Clean Touch and Mouse Drag / Click Engine Routing
         let holdTimer = null;
         let isDraggingIcon = false;
         let activeDragElement = null;
         let dragOffset = { x: 0, y: 0 };
-        let holdTriggered = false; 
+        let holdTriggered = false;
 
         document.querySelectorAll('.draggable-icon').forEach(element => {
             
-            const startPress = (clientX, clientY) => {
+            function handlePressStart(e, clientX, clientY) {
                 if (isAppOpen) return;
                 holdTriggered = false;
-                
                 element.classList.add('hold-active');
+
                 holdTimer = setTimeout(() => {
                     holdTriggered = true;
                     isDraggingIcon = true;
@@ -637,24 +577,19 @@
                     element.classList.remove('hold-active');
                     element.classList.add('dragging');
                     
-                    // Center pointer inside element to feel premium
                     const rect = element.getBoundingClientRect();
                     dragOffset.x = clientX - rect.left;
                     dragOffset.y = clientY - rect.top;
-                    
-                    moveIcon(clientX, clientY);
-                }, 500); // Strict 0.50 seconds threshold target
-            };
+                }, 500);
+            }
 
-            const moveIcon = (clientX, clientY) => {
+            function handlePressMove(clientX, clientY) {
                 if (!isDraggingIcon || activeDragElement !== element) return;
                 const screenRect = screen.getBoundingClientRect();
                 
-                // Track finger coordinates relative to parent display wrapper container
                 let localX = clientX - screenRect.left - dragOffset.x;
                 let localY = clientY - screenRect.top - dragOffset.y;
                 
-                // CRITICAL: Bezel Collision Detection Engine (Strict boundaries)
                 const maxLeft = screenRect.width - element.offsetWidth;
                 const maxTop = screenRect.height - element.offsetHeight;
                 
@@ -665,14 +600,13 @@
                 
                 element.style.left = `${localX}px`;
                 element.style.top = `${localY}px`;
-            };
+            }
 
-            const endPress = () => {
+            function handlePressEnd(e) {
                 clearTimeout(holdTimer);
                 element.classList.remove('hold-active');
                 
                 if (!holdTriggered && !isDraggingIcon) {
-                    // Quick Single tap handler routed instantly
                     if (element.id === 'settings-trigger') openApp(settingsApp);
                     if (element.id === 'app2-trigger') openApp(app2App);
                 }
@@ -683,123 +617,108 @@
                     activeDragElement = null;
                     setAppWindowPositions();
                 }
-            };
+            }
 
-            // Touch events
+            // Mobile strict inputs path layout
             element.addEventListener('touchstart', (e) => {
-                startPress(e.touches[0].clientX, e.touches[0].clientY);
+                handlePressStart(e, e.touches[0].clientX, e.touches[0].clientY);
             }, { passive: true });
 
-            window.addEventListener('touchmove', (e) => {
-                if (isDraggingIcon && activeDragElement === element) {
-                    moveIcon(e.touches[0].clientX, e.touches[0].clientY);
+            element.addEventListener('touchmove', (e) => {
+                if (isDraggingIcon) {
+                    if(e.cancelable) e.preventDefault();
+                    handlePressMove(e.touches[0].clientX, e.touches[0].clientY);
                 }
             }, { passive: false });
 
-            window.addEventListener('touchend', endPress);
+            element.addEventListener('touchend', (e) => {
+                handlePressEnd(e);
+            }, { passive: true });
 
-            // Mouse events
+            // Desktop fallback paths layout
             element.addEventListener('mousedown', (e) => {
-                startPress(e.clientX, e.clientY);
+                handlePressStart(e, e.clientX, e.clientY);
                 
-                const mouseMoveHandler = (moveEvent) => {
-                    moveIcon(moveEvent.clientX, moveEvent.clientY);
+                const mm = (me) => handlePressMove(me.clientX, me.clientY);
+                const mu = () => {
+                    handlePressEnd();
+                    window.removeEventListener('mousemove', mm);
+                    window.removeEventListener('mouseup', mu);
                 };
-                
-                const mouseUpHandler = () => {
-                    endPress();
-                    window.removeEventListener('mousemove', mouseMoveHandler);
-                    window.removeEventListener('mouseup', mouseUpHandler);
-                };
-                
-                window.addEventListener('mousemove', mouseMoveHandler);
-                window.addEventListener('mouseup', mouseUpHandler);
+                window.addEventListener('mousemove', mm);
+                window.addEventListener('mouseup', mu);
             });
         });
 
-        // Gesture Navigation System Bar Transitions Engine
+        // Mobile Enhanced Swipe to Close Engine
+        function gestureStart(clientY) {
+            if (!isAppOpen || !activeApp) return;
+            startY = clientY;
+            currentY = startY;
+            isDragging = true;
+            activeApp.classList.add('dragging');
+        }
+
+        function gestureMove(e, clientY) {
+            if (!isDragging || !activeApp) return;
+            let deltaY = startY - clientY;
+            if (deltaY > 0) {
+                if (e && e.cancelable) e.preventDefault();
+                let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
+                let radiusFactor = Math.min(38, 28 + (deltaY / 12));
+                activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
+                activeApp.style.borderRadius = `${radiusFactor}px`;
+                gestureLine.style.transform = `translateY(${-deltaY * 0.25}px)`;
+            }
+        }
+
+        function gestureEnd() {
+            if (!isDragging || !activeApp) return;
+            isDragging = false;
+            activeApp.classList.remove('dragging');
+            let deltaY = startY - currentY;
+            
+            if (deltaY > 60) { 
+                closeActiveApp(); 
+            } else {
+                activeApp.style.transform = '';
+                activeApp.style.borderRadius = '';
+                gestureLine.style.transform = '';
+            }
+        }
+
         navBar.addEventListener('touchstart', (e) => { 
-            if (isAppOpen) { 
-                startY = e.touches[0].clientY; 
-                currentY = startY; 
-                initDrag(); 
-            } 
+            gestureStart(e.touches[0].clientY); 
         }, { passive: true });
         
-        navBar.addEventListener('touchmove', (e) => { 
-            if (isDragging) { 
-                currentY = e.touches[0].clientY; 
-                let deltaY = startY - currentY;
-                
-                if (deltaY > 0) {
-                    if (e.cancelable) e.preventDefault();
-                    let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
-                    let radiusFactor = Math.min(38, 28 + (deltaY / 12));
-                    activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
-                    activeApp.style.borderRadius = `${radiusFactor}px`;
-                    gestureLine.style.transform = `translateY(${-deltaY * 0.25}px)`;
-                }
-            } 
+        window.addEventListener('touchmove', (e) => { 
+            if(isDragging) gestureMove(e, e.touches[0].clientY);
         }, { passive: false });
         
-        navBar.addEventListener('touchend', () => { 
-            if (isDragging) {
-                isDragging = false;
-                activeApp.classList.remove('dragging');
-                let deltaY = startY - currentY;
-                
-                if (deltaY > 75) { 
-                    closeActiveApp(); 
-                } else {
-                    activeApp.style.transform = '';
-                    activeApp.style.borderRadius = '';
-                    gestureLine.style.transform = '';
-                }
-            }
-        });
-        
-        navBar.addEventListener('mousedown', (e) => {
-            if (!isAppOpen) return;
-            startY = e.clientY; 
-            currentY = startY;
-            initDrag();
-            
-            document.onmousemove = (event) => { 
-                currentY = event.clientY; 
-                let deltaY = startY - currentY;
-                if (deltaY > 0) {
-                    let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
-                    activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
-                }
-            };
-            
-            document.onmouseup = () => { 
-                document.onmousemove = null; 
-                document.onmouseup = null; 
-                isDragging = false;
-                activeApp.classList.remove('dragging');
-                if ((startY - currentY) > 75) { 
-                    closeActiveApp(); 
-                } else {
-                    activeApp.style.transform = '';
-                }
-            };
-        });
+        window.addEventListener('touchend', gestureEnd);
 
-        function initDrag() { isDragging = true; activeApp.classList.add('dragging'); }
+        navBar.addEventListener('mousedown', (e) => {
+            gestureStart(e.clientY);
+            const mm = (ev) => { currentY = ev.clientY; gestureMove(ev, ev.clientY); };
+            const mu = () => { gestureEnd(); window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); };
+            window.addEventListener('mousemove', mm);
+            window.addEventListener('mouseup', mu);
+        });
 
         function closeActiveApp() {
+            if(!activeApp) return;
+            const closedApp = activeApp;
             isAppOpen = false;
             screen.classList.remove('app-open');
-            activeApp.classList.remove('open');
+            closedApp.classList.remove('open');
             
-            searchBar.value = '';
-            searchBar.blur();
-            document.querySelectorAll('#settings-app .settings-item').forEach(i => i.style.display = 'flex');
-            
-            activeApp.style.transform = (activeApp === settingsApp) ? settingsTransformState : app2TransformState;
-            activeApp.style.borderRadius = "12px";
             gestureLine.style.transform = '';
+            
+            setTimeout(() => {
+                closedApp.style.transform = (closedApp === settingsApp) ? settingsTransformState : app2TransformState;
+                closedApp.style.borderRadius = "12px";
+                if(activeApp === closedApp) activeApp = null;
+            }, 10);
             activeApp = null;
         }
     </script>
