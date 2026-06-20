@@ -65,35 +65,37 @@
             overflow: hidden;
         }
 
-        /* Camera Punch Hole */
+        /* Camera Punch Hole - Shifted UP and made BIGGER */
         .camera {
             position: absolute;
-            top: 26px;
+            top: 16px;
             left: 50%;
             transform: translateX(-50%);
-            width: 12px;
-            height: 12px;
+            width: 16px;
+            height: 16px;
             background: #000;
             border-radius: 50%;
             z-index: 120;
             pointer-events: none;
         }
 
-        /* Dark Gradient Abstract Google Pixel Wallpaper Art */
+        /* Custom Wallpaper with blur transitions */
         .wallpaper {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('https://images.unsplash.com/photo-1614850523459-c2f4c699c52e?q=80&w=1000&auto=format&fit=crop') center/cover;
-            transition: transform 0.5s cubic-bezier(0.15, 0.85, 0.15, 1);
+            background: url('https://i.pinimg.com/736x/25/ac/b4/25acb4c8797511366a6fc3da8e453d75.jpg') center/cover;
+            transition: transform 0.5s cubic-bezier(0.15, 0.85, 0.15, 1), filter 0.4s ease;
             transform: scale(1);
+            filter: blur(0px);
             z-index: 1;
         }
 
         .screen.app-open .wallpaper {
             transform: scale(1.08);
+            filter: blur(15px);
         }
 
         /* Home Screen UI Layout */
@@ -105,9 +107,80 @@
             height: 100%;
             z-index: 2;
             padding: 50px 18px 30px 18px;
+        }
+
+        /* App Grid Layout Container */
+        .app-grid {
+            position: relative;
+            width: 100%;
+            height: 100%;
+        }
+
+        .app-icon-wrapper {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            position: absolute; 
+            z-index: 5;
+            transition: transform 0.2s ease, opacity 0.2s ease;
+        }
+
+        /* Default starting positions on the workspace canvas */
+        #settings-trigger { left: 10px; top: 20px; }
+        #app2-trigger { left: 85px; top: 20px; }
+
+        .app-icon-wrapper.dragging {
+            z-index: 999;
+            pointer-events: none;
+            transform: scale(1.15);
+            opacity: 0.9;
+            transition: none !important;
+        }
+
+        .app-icon-wrapper.hold-active {
+            transform: scale(1.1);
+        }
+
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
+            background-size: cover;
+            background-position: center;
+        }
+
+        /* custom PNG image asset integration */
+        #settings-trigger .app-icon {
+            background-image: url('https://static.wikia.nocookie.net/logopedia/images/2/27/Settings_android-8.png/revision/latest?cb=20240930165358');
+            background-color: transparent;
+            box-shadow: none;
+        }
+
+        #app2-trigger .app-icon {
+            background: #a8c7fa;
+        }
+
+        #app2-trigger .app-icon svg {
+            width: 26px;
+            height: 26px;
+            fill: #3c4043;
+        }
+
+        .app-label {
+            color: white;
+            font-size: 10px;
+            margin-top: 6px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
+            text-align: center;
+            width: 60px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         /* Fixed Status Bar */
@@ -142,53 +215,6 @@
             width: 13px;
             height: 13px;
             fill: currentColor;
-        }
-
-        /* App Grid Layout */
-        .app-grid {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .app-icon-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-        }
-
-        .app-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-        }
-
-        #settings-trigger .app-icon {
-            background: #e3e3e4;
-        }
-
-        #app2-trigger .app-icon {
-            background: #a8c7fa;
-        }
-
-        .app-icon svg {
-            width: 26px;
-            height: 26px;
-            fill: #3c4043;
-        }
-
-        .app-label {
-            color: white;
-            font-size: 10px;
-            margin-top: 6px;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.4);
-            text-align: center;
         }
 
         /* App Window Base Styles */
@@ -389,17 +415,13 @@
             <div class="wallpaper" id="wallpaper"></div>
 
             <div class="home-screen">
-                <div class="app-grid">
-                    <div class="app-icon-wrapper" id="settings-trigger">
-                        <div class="app-icon" id="target-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69-.98l.38-2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69-.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3-1.57-3-3.5s1.07-3.5 3-3.5 3 1.57 3 3.5-1.07 3.5-3 3.5z"/>
-                            </svg>
-                        </div>
+                <div class="app-grid" id="app-grid">
+                    <div class="app-icon-wrapper draggable-icon" id="settings-trigger">
+                        <div class="app-icon" id="target-icon"></div>
                         <div class="app-label">Settings</div>
                     </div>
 
-                    <div class="app-icon-wrapper" id="app2-trigger">
+                    <div class="app-icon-wrapper draggable-icon" id="app2-trigger">
                         <div class="app-icon" id="app2-icon">
                             <svg viewBox="0 0 24 24">
                                 <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
@@ -468,7 +490,9 @@
 
             <div class="app-window" id="app2-app">
                 <div class="app-content">
-                    </div>
+                    <h1 class="settings-title">App Two</h1>
+                    <p style="color: var(--sec-text); font-size: 14px;">Placeholder workspace viewport content.</p>
+                </div>
             </div>
 
             <div class="nav-bar" id="nav-bar">
@@ -511,7 +535,7 @@
         setInterval(updateClock, 1000);
         updateClock();
 
-        // Feature Text Rows
+        // Menu item links
         document.getElementById('net-item').addEventListener('click', () => {
             alert('Searching for nearby Wi-Fi networks...');
         });
@@ -553,7 +577,6 @@
         function setAppWindowPositions() {
             const screenRect = screen.getBoundingClientRect();
 
-            // Settings transform
             const iconRect = targetIcon.getBoundingClientRect();
             const localLeft = iconRect.left - screenRect.left;
             const localTop = iconRect.top - screenRect.top;
@@ -566,7 +589,6 @@
                 settingsApp.style.borderRadius = "12px";
             }
 
-            // App2 transform
             const app2Rect = app2Icon.getBoundingClientRect();
             const app2LocalLeft = app2Rect.left - screenRect.left;
             const app2LocalTop = app2Rect.top - screenRect.top;
@@ -580,14 +602,12 @@
             }
         }
         
-        setTimeout(setAppWindowPositions, 100);
+        setTimeout(setAppWindowPositions, 200);
         window.addEventListener('resize', setAppWindowPositions);
 
-        // Open App Controllers
-        settingsTrigger.addEventListener('click', () => openApp(settingsApp));
-        app2Trigger.addEventListener('click', () => openApp(app2App));
-
+        // Open App Logic
         function openApp(appTarget) {
+            if (isDraggingIcon) return; 
             setAppWindowPositions();
             appTarget.getBoundingClientRect(); 
             activeApp = appTarget;
@@ -596,7 +616,108 @@
             appTarget.classList.add('open');
         }
 
-        // GESTURE ENGINE
+        // 0.50 Seconds Tap & Hold To Drag Engine Configuration
+        let holdTimer = null;
+        let isDraggingIcon = false;
+        let activeDragElement = null;
+        let dragOffset = { x: 0, y: 0 };
+        let holdTriggered = false; 
+
+        document.querySelectorAll('.draggable-icon').forEach(element => {
+            
+            const startPress = (clientX, clientY) => {
+                if (isAppOpen) return;
+                holdTriggered = false;
+                
+                element.classList.add('hold-active');
+                holdTimer = setTimeout(() => {
+                    holdTriggered = true;
+                    isDraggingIcon = true;
+                    activeDragElement = element;
+                    element.classList.remove('hold-active');
+                    element.classList.add('dragging');
+                    
+                    // Center pointer inside element to feel premium
+                    const rect = element.getBoundingClientRect();
+                    dragOffset.x = clientX - rect.left;
+                    dragOffset.y = clientY - rect.top;
+                    
+                    moveIcon(clientX, clientY);
+                }, 500); // Strict 0.50 seconds threshold target
+            };
+
+            const moveIcon = (clientX, clientY) => {
+                if (!isDraggingIcon || activeDragElement !== element) return;
+                const screenRect = screen.getBoundingClientRect();
+                
+                // Track finger coordinates relative to parent display wrapper container
+                let localX = clientX - screenRect.left - dragOffset.x;
+                let localY = clientY - screenRect.top - dragOffset.y;
+                
+                // CRITICAL: Bezel Collision Detection Engine (Strict boundaries)
+                const maxLeft = screenRect.width - element.offsetWidth;
+                const maxTop = screenRect.height - element.offsetHeight;
+                
+                if (localX < 0) localX = 0;
+                if (localX > maxLeft) localX = maxLeft;
+                if (localY < 0) localY = 0;
+                if (localY > maxTop) localY = maxTop;
+                
+                element.style.left = `${localX}px`;
+                element.style.top = `${localY}px`;
+            };
+
+            const endPress = () => {
+                clearTimeout(holdTimer);
+                element.classList.remove('hold-active');
+                
+                if (!holdTriggered && !isDraggingIcon) {
+                    // Quick Single tap handler routed instantly
+                    if (element.id === 'settings-trigger') openApp(settingsApp);
+                    if (element.id === 'app2-trigger') openApp(app2App);
+                }
+
+                if (isDraggingIcon && activeDragElement === element) {
+                    isDraggingIcon = false;
+                    element.classList.remove('dragging');
+                    activeDragElement = null;
+                    setAppWindowPositions();
+                }
+            };
+
+            // Touch events
+            element.addEventListener('touchstart', (e) => {
+                startPress(e.touches[0].clientX, e.touches[0].clientY);
+            }, { passive: true });
+
+            window.addEventListener('touchmove', (e) => {
+                if (isDraggingIcon && activeDragElement === element) {
+                    moveIcon(e.touches[0].clientX, e.touches[0].clientY);
+                }
+            }, { passive: false });
+
+            window.addEventListener('touchend', endPress);
+
+            // Mouse events
+            element.addEventListener('mousedown', (e) => {
+                startPress(e.clientX, e.clientY);
+                
+                const mouseMoveHandler = (moveEvent) => {
+                    moveIcon(moveEvent.clientX, moveEvent.clientY);
+                };
+                
+                const mouseUpHandler = () => {
+                    endPress();
+                    window.removeEventListener('mousemove', mouseMoveHandler);
+                    window.removeEventListener('mouseup', mouseUpHandler);
+                };
+                
+                window.addEventListener('mousemove', mouseMoveHandler);
+                window.addEventListener('mouseup', mouseUpHandler);
+            });
+        });
+
+        // Gesture Navigation System Bar Transitions Engine
         navBar.addEventListener('touchstart', (e) => { 
             if (isAppOpen) { 
                 startY = e.touches[0].clientY; 
