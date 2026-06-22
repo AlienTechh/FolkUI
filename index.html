@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PixelUI (Android 15)</title>
+    <title>PixelUI Emulator (Android 15)</title>
     <style>
         :root {
             --android-radius: 28px;
@@ -194,15 +194,17 @@
             justify-content: center;
             align-items: center;
             box-shadow: 0 3px 8px rgba(0,0,0,0.2);
-            background-size: cover;
+            background-size: contain;
+            background-repeat: no-repeat;
             background-position: center;
         }
 
-        /* Restored Custom Image PNG for Settings */
+        /* Settings Icon Overrides */
         #settings-trigger .app-icon {
-            background-image: url('https://static.wikia.nocookie.net/logopedia/images/2/27/Settings_android-8.png/revision/latest?cb=20240930165358');
+            background-image: url('https://kommodo.ai/i/Puvd1vwlzuKCoegmKsib');
             background-color: transparent;
             box-shadow: none;
+            border-radius: 0px;
         }
 
         #app2-trigger .app-icon {
@@ -305,6 +307,7 @@
             transition: opacity 0.2s ease;
             overflow-y: scroll;
             -webkit-overflow-scrolling: touch;
+            position: relative;
         }
 
         .app-content::-webkit-scrollbar { display: none; }
@@ -314,11 +317,53 @@
             transition-delay: 0.1s;
         }
 
+        /* Nested View Layout for About Panel Submenu */
+        .settings-subpage {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            padding: 55px 16px 45px 16px;
+            z-index: 20;
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .settings-subpage.active {
+            transform: translateX(0);
+        }
+
+        .subpage-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 5px;
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            outline: none;
+        }
+        .back-btn:active { background: var(--surface-variant); }
+        .back-btn svg { width: 22px; height: 22px; fill: var(--text-color); }
+
         .settings-title {
             font-size: 24px;
             font-weight: 400;
             color: var(--text-color);
-            margin-top: 5px;
         }
 
         .search-wrapper { position: relative; }
@@ -446,8 +491,14 @@
             height: 100%;
             background: #000;
             z-index: 900;
-            display: block;
-            pointer-events: auto;
+            opacity: 1; 
+            pointer-events: auto; 
+            transition: opacity 0.35s ease;
+        }
+        
+        .screen-blackout.hidden {
+            opacity: 0;
+            pointer-events: none;
         }
 
         /* Lockscreen View Interface Layout */
@@ -599,8 +650,64 @@
                                     <span class="slider"></span>
                                 </label>
                             </div>
+                            
+                            <div class="settings-item">
+                                <div class="settings-item-left" id="about-phone-btn">
+                                    <div class="settings-item-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                                    </div>
+                                    <div class="settings-item-text">
+                                        <h4>About phone</h4>
+                                        <p>Pixel UI Emulator • Android 15</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="settings-subpage" id="about-phone-subpage">
+                        <div class="subpage-header">
+                            <button class="back-btn" id="about-back-btn">
+                                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                            </button>
+                            <h1 class="settings-title">About phone</h1>
+                        </div>
+                        <div class="settings-list">
+                            <div class="settings-item">
+                                <div class="settings-item-left">
+                                    <div class="settings-item-text">
+                                        <h4>Device name</h4>
+                                        <p>Pixel UI virtual device</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-item">
+                                <div class="settings-item-left">
+                                    <div class="settings-item-text">
+                                        <h4>Android version</h4>
+                                        <p>15 (Vanilla Ice Cream)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-item">
+                                <div class="settings-item-left">
+                                    <div class="settings-item-text">
+                                        <h4>Storage</h4>
+                                        <p>24.5 GB used of 128 GB</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="settings-item">
+                                <div class="settings-item-left">
+                                    <div class="settings-item-text">
+                                        <h4>Build number</h4>
+                                        <p>AP3A.260622.015</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
 
                 <div class="app-window" id="app2-app">
@@ -638,6 +745,11 @@
         const lockscreenLayer = document.getElementById('lockscreen-layer');
         const lockClockText = document.getElementById('lock-clock-text');
 
+        // Functional view elements for About Sub-panel
+        const aboutPhoneBtn = document.getElementById('about-phone-btn');
+        const aboutPhoneSubpage = document.getElementById('about-phone-subpage');
+        const aboutBackBtn = document.getElementById('about-back-btn');
+
         let isPhoneOn = false; 
         let isLocked = true;
         let activeApp = null;
@@ -659,12 +771,22 @@
         darkThemeToggle.addEventListener('change', (e) => {
             const act = e.target.checked ? 'add' : 'remove';
             settingsApp.classList[act]('dark-theme');
+            aboutPhoneSubpage.classList[act]('dark-theme');
             app2App.classList[act]('dark-theme');
             screen.classList[act]('dark-active');
         });
 
         soundToggle.addEventListener('change', (e) => {
             soundStatus.textContent = e.target.checked ? "Ring volume at 80%" : "Muted / Vibrate only";
+        });
+
+        // Click actions for nested menu navigation
+        aboutPhoneBtn.addEventListener('click', () => {
+            aboutPhoneSubpage.classList.add('active');
+        });
+
+        aboutBackBtn.addEventListener('click', () => {
+            aboutPhoneSubpage.classList.remove('active');
         });
 
         function setAppWindowPositions() {
@@ -690,23 +812,27 @@
             appTarget.classList.add('open');
         }
 
-        // Power Button Controller
+        // Power Button Controller - Fades screen in/out smoothly
         hardwarePower.addEventListener('click', () => {
             if (isPhoneOn) {
                 isPhoneOn = false;
                 isLocked = true;
                 screen.classList.add('locked');
-                displaySleepLayer.style.display = 'block';
-                lockscreenLayer.style.display = 'none';
-                closeActiveApp();
+                displaySleepLayer.classList.remove('hidden'); 
+                
+                setTimeout(() => {
+                    lockscreenLayer.style.display = 'none';
+                    aboutPhoneSubpage.classList.remove('active'); // Close subpage if open
+                    closeActiveApp();
+                }, 350);
             } else {
                 isPhoneOn = true;
                 isLocked = true;
                 screen.classList.add('locked');
-                displaySleepLayer.style.display = 'none';
                 lockscreenLayer.style.display = 'flex';
                 lockscreenLayer.style.transform = '';
                 lockscreenLayer.style.opacity = '1';
+                displaySleepLayer.classList.add('hidden'); 
             }
         });
 
@@ -916,6 +1042,7 @@
             
             setTimeout(() => {
                 closedApp.style.transform = (closedApp === settingsApp) ? settingsTransformState : app2TransformState;
+                aboutPhoneSubpage.classList.remove('active'); // Instantly reset back navigation state
                 if(activeApp === closedApp) activeApp = null;
             }, 10);
             activeApp = null;
