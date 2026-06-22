@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>PixelUI Emulator (Android 15)</title>
     <style>
         :root {
@@ -41,6 +41,9 @@
             align-items: center;
             min-height: 100vh;
             overflow: hidden;
+            position: fixed;
+            width: 100%;
+            height: 100%;
         }
 
         /* Phone Frame */
@@ -360,20 +363,21 @@
         input:checked + .slider { background-color: #a8c7fa; }
         input:checked + .slider:before { transform: translateX(16px); background-color: #0b57d0; }
 
-        /* Enhanced Mobile Target Gesture Navigation Zone */
+        /* Gesture Interface Block */
         .nav-bar {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 40px;
+            height: 48px; 
             z-index: 140;
             display: flex;
             justify-content: center;
             align-items: flex-end;
-            padding-bottom: 8px;
+            padding-bottom: 10px;
             cursor: grab;
             background: transparent;
+            touch-action: none !important; 
         }
         .nav-bar:active { cursor: grabbing; }
 
@@ -532,7 +536,6 @@
             soundStatus.textContent = e.target.checked ? "Ring volume at 80%" : "Muted / Vibrate only";
         });
 
-        // Fixed Windows Layer Positions
         function setAppWindowPositions() {
             if (isAppOpen) return;
             const screenRect = screen.getBoundingClientRect();
@@ -556,7 +559,7 @@
             appTarget.classList.add('open');
         }
 
-        // Clean Touch and Mouse Drag / Click Engine Routing
+        // App Icon Drag Logic
         let holdTimer = null;
         let isDraggingIcon = false;
         let activeDragElement = null;
@@ -602,7 +605,7 @@
                 element.style.top = `${localY}px`;
             }
 
-            function handlePressEnd(e) {
+            function handlePressEnd() {
                 clearTimeout(holdTimer);
                 element.classList.remove('hold-active');
                 
@@ -619,7 +622,6 @@
                 }
             }
 
-            // Mobile strict inputs path layout
             element.addEventListener('touchstart', (e) => {
                 handlePressStart(e, e.touches[0].clientX, e.touches[0].clientY);
             }, { passive: true });
@@ -631,14 +633,10 @@
                 }
             }, { passive: false });
 
-            element.addEventListener('touchend', (e) => {
-                handlePressEnd(e);
-            }, { passive: true });
+            element.addEventListener('touchend', handlePressEnd, { passive: true });
 
-            // Desktop fallback paths layout
             element.addEventListener('mousedown', (e) => {
                 handlePressStart(e, e.clientX, e.clientY);
-                
                 const mm = (me) => handlePressMove(me.clientX, me.clientY);
                 const mu = () => {
                     handlePressEnd();
@@ -650,7 +648,7 @@
             });
         });
 
-        // Mobile Enhanced Swipe to Close Engine
+        // Swipe Up Gesture Controller
         function gestureStart(clientY) {
             if (!isAppOpen || !activeApp) return;
             startY = clientY;
@@ -661,6 +659,7 @@
 
         function gestureMove(e, clientY) {
             if (!isDragging || !activeApp) return;
+            currentY = clientY;
             let deltaY = startY - clientY;
             if (deltaY > 0) {
                 if (e && e.cancelable) e.preventDefault();
@@ -678,7 +677,7 @@
             activeApp.classList.remove('dragging');
             let deltaY = startY - currentY;
             
-            if (deltaY > 60) { 
+            if (deltaY > 45) { 
                 closeActiveApp(); 
             } else {
                 activeApp.style.transform = '';
@@ -695,7 +694,13 @@
             if(isDragging) gestureMove(e, e.touches[0].clientY);
         }, { passive: false });
         
-        window.addEventListener('touchend', gestureEnd);
+        // Changed to changedTouches target array so mobile recognizes the calculation upon release
+        window.addEventListener('touchend', (e) => {
+            if (isDragging && e.changedTouches && e.changedTouches.length > 0) {
+                currentY = e.changedTouches[0].clientY;
+            }
+            gestureEnd();
+        });
 
         navBar.addEventListener('mousedown', (e) => {
             gestureStart(e.clientY);
@@ -713,10 +718,10 @@
             closedApp.classList.remove('open');
             
             gestureLine.style.transform = '';
+            closedApp.style.borderRadius = "12px";
             
             setTimeout(() => {
                 closedApp.style.transform = (closedApp === settingsApp) ? settingsTransformState : app2TransformState;
-                closedApp.style.borderRadius = "12px";
                 if(activeApp === closedApp) activeApp = null;
             }, 10);
             activeApp = null;
