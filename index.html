@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>PixelUI Emulator (Android 15)</title>
+    <title>PixelUI (Android 15)</title>
     <style>
         :root {
             --android-radius: 28px;
@@ -44,6 +44,30 @@
             position: fixed;
             width: 100%;
             height: 100%;
+        }
+
+        /* Phone Container Wrapper for hardware buttons */
+        .phone-container {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Hardware Power Button */
+        .power-btn {
+            position: absolute;
+            right: -6px;
+            top: 140px;
+            width: 6px;
+            height: 55px;
+            background: #ff3b30;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 1px 2px 4px rgba(0,0,0,0.3);
+        }
+        .power-btn:active {
+            transform: translateX(-1px);
         }
 
         /* Phone Frame */
@@ -110,6 +134,24 @@
             height: 100%;
             z-index: 2;
             padding: 50px 18px 30px 18px;
+            opacity: 1;
+            transition: transform 0.3s cubic-bezier(0.1, 0.9, 0.2, 1), opacity 0.25s ease;
+        }
+
+        /* Hide Home Screen entirely while locked */
+        .screen.locked .home-screen {
+            opacity: 0 !important;
+            pointer-events: none;
+        }
+
+        /* Fast App scale down zoom look on unlock */
+        .screen.unlocking-zoom .home-screen {
+            animation: zoomDownFast 0.35s cubic-bezier(0.06, 0.93, 0.23, 1) forwards;
+        }
+
+        @keyframes zoomDownFast {
+            0% { transform: scale(1.3); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
         }
 
         /* App Grid Layout Container */
@@ -156,6 +198,7 @@
             background-position: center;
         }
 
+        /* Restored Custom Image PNG for Settings */
         #settings-trigger .app-icon {
             background-image: url('https://static.wikia.nocookie.net/logopedia/images/2/27/Settings_android-8.png/revision/latest?cb=20240930165358');
             background-color: transparent;
@@ -393,106 +436,185 @@
 
         .screen.app-open .gesture-line { background: rgba(0, 0, 0, 0.6); }
         .screen.app-open.dark-active .gesture-line { background: rgba(255, 255, 255, 0.6); }
+
+        /* System Display Sleep State */
+        .screen-blackout {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 900;
+            display: block;
+            pointer-events: auto;
+        }
+
+        /* Lockscreen View Interface Layout */
+        .lockscreen-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            padding: 80px 24px 50px 24px;
+            will-change: transform, opacity;
+            transition: transform 0.4s cubic-bezier(0.15, 0.85, 0.15, 1), opacity 0.2s ease;
+            touch-action: none;
+            cursor: grab;
+        }
+        .lockscreen-overlay:active { cursor: grabbing; }
+        .lockscreen-overlay.dragging {
+            transition: none !important;
+        }
+
+        .lock-clock-wrapper {
+            text-align: center;
+            color: #fff;
+            pointer-events: none;
+        }
+        .lock-time {
+            font-size: 54px;
+            font-weight: 200;
+            line-height: 1;
+        }
+        .lock-date {
+            font-size: 14px;
+            font-weight: 400;
+            margin-top: 6px;
+            opacity: 0.8;
+        }
+        .lock-hint-msg {
+            color: #fff;
+            font-size: 12px;
+            opacity: 0.6;
+            animation: pulseHint 2s infinite ease-in-out;
+            pointer-events: none;
+        }
+        @keyframes pulseHint {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
     </style>
 </head>
 <body>
 
-    <div class="phone-frame">
-        <div class="camera"></div>
+    <div class="phone-container">
+        <div class="power-btn" id="hardware-power"></div>
         
-        <div class="screen" id="screen">
+        <div class="phone-frame">
+            <div class="camera"></div>
             
-            <div class="status-bar">
-                <span id="status-clock">09:30</span>
-                <div class="status-icons">
-                    <svg viewBox="0 0 24 24"><path d="M12 21l-12-14c4.667-4.667 19.333-4.667 24 0l-12 14z"/></svg>
-                    <svg viewBox="0 0 24 24"><path d="M17 5H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 2v2H8V7h8z"/></svg>
-                </div>
-            </div>
+            <div class="screen locked" id="screen">
+                
+                <div class="screen-blackout" id="display-sleep-layer"></div>
 
-            <div class="wallpaper" id="wallpaper"></div>
-
-            <div class="home-screen">
-                <div class="app-grid" id="app-grid">
-                    <div class="app-icon-wrapper draggable-icon" id="settings-trigger">
-                        <div class="app-icon" id="target-icon"></div>
-                        <div class="app-label">Settings</div>
+                <div class="lockscreen-overlay" id="lockscreen-layer">
+                    <div class="lock-clock-wrapper">
+                        <div class="lock-time" id="lock-clock-text">09:30</div>
+                        <div class="lock-date">Monday, Jun 22</div>
                     </div>
+                    <div class="lock-hint-msg">Swipe up to unlock</div>
+                </div>
+                
+                <div class="status-bar">
+                    <span id="status-clock">09:30</span>
+                    <div class="status-icons">
+                        <svg viewBox="0 0 24 24"><path d="M12 21l-12-14c4.667-4.667 19.333-4.667 24 0l-12 14z"/></svg>
+                        <svg viewBox="0 0 24 24"><path d="M17 5H7c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm-1 2v2H8V7h8z"/></svg>
+                    </div>
+                </div>
 
-                    <div class="app-icon-wrapper draggable-icon" id="app2-trigger">
-                        <div class="app-icon" id="app2-icon">
-                            <svg viewBox="0 0 24 24">
-                                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
-                            </svg>
+                <div class="wallpaper" id="wallpaper"></div>
+
+                <div class="home-screen">
+                    <div class="app-grid" id="app-grid">
+                        <div class="app-icon-wrapper draggable-icon" id="settings-trigger">
+                            <div class="app-icon" id="target-icon"></div>
+                            <div class="app-label">Settings</div>
                         </div>
-                        <div class="app-label">App2</div>
+
+                        <div class="app-icon-wrapper draggable-icon" id="app2-trigger">
+                            <div class="app-icon" id="app2-icon">
+                                <svg viewBox="0 0 24 24">
+                                    <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm0 14H8V4h12v12z"/>
+                                </svg>
+                            </div>
+                            <div class="app-label">App2</div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="app-window" id="settings-app">
-                <div class="app-content">
-                    <h1 class="settings-title">Settings</h1>
-                    <div class="search-wrapper">
-                        <input type="text" class="settings-search" id="search-bar" placeholder="Search settings..." autocomplete="off">
-                    </div>
-                    <div class="settings-list">
-                        <div class="settings-item">
-                            <div class="settings-item-left" id="net-item">
-                                <div class="settings-item-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M12 21l-12-14c4.667-4.667 19.333-4.667 24 0l-12 14z"/></svg>
-                                </div>
-                                <div class="settings-item-text">
-                                    <h4>Network & internet</h4>
-                                    <p id="network-status">Connected to Google_Fi</p>
+                <div class="app-window" id="settings-app">
+                    <div class="app-content">
+                        <h1 class="settings-title">Settings</h1>
+                        <div class="search-wrapper">
+                            <input type="text" class="settings-search" id="search-bar" placeholder="Search settings..." autocomplete="off">
+                        </div>
+                        <div class="settings-list">
+                            <div class="settings-item">
+                                <div class="settings-item-left" id="net-item">
+                                    <div class="settings-item-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M12 21l-12-14c4.667-4.667 19.333-4.667 24 0l-12 14z"/></svg>
+                                    </div>
+                                    <div class="settings-item-text">
+                                        <h4>Network & internet</h4>
+                                        <p id="network-status">Connected to Google_Fi</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="settings-item">
-                            <div class="settings-item-left" id="dark-item">
-                                <div class="settings-item-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 0 0 11.5-11.5 10.3 10.3 0 0 1-9.6-8.3z"/></svg>
+                            <div class="settings-item">
+                                <div class="settings-item-left" id="dark-item">
+                                    <div class="settings-item-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M12.3 2a10 10 0 0 0-1.9 19.8 10 10 0 0 0 11.5-11.5 10.3 10.3 0 0 1-9.6-8.3z"/></svg>
+                                    </div>
+                                    <div class="settings-item-text">
+                                        <h4>Dark theme</h4>
+                                        <p>Tweak presentation optics</p>
+                                    </div>
                                 </div>
-                                <div class="settings-item-text">
-                                    <h4>Dark theme</h4>
-                                    <p>Tweak presentation optics</p>
-                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="dark-theme-toggle">
+                                    <span class="slider"></span>
+                                </label>
                             </div>
-                            <label class="switch">
-                                <input type="checkbox" id="dark-theme-toggle">
-                                <span class="slider"></span>
-                            </label>
-                        </div>
-                        <div class="settings-item">
-                            <div class="settings-item-left" id="sound-item">
-                                <div class="settings-item-icon">
-                                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                            <div class="settings-item">
+                                <div class="settings-item-left" id="sound-item">
+                                    <div class="settings-item-icon">
+                                        <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+                                    </div>
+                                    <div class="settings-item-text">
+                                        <h4>Sound & vibration</h4>
+                                        <p id="sound-status">Ring volume at 80%</p>
+                                    </div>
                                 </div>
-                                <div class="settings-item-text">
-                                    <h4>Sound & vibration</h4>
-                                    <p id="sound-status">Ring volume at 80%</p>
-                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="sound-toggle" checked>
+                                    <span class="slider"></span>
+                                </label>
                             </div>
-                            <label class="switch">
-                                <input type="checkbox" id="sound-toggle" checked>
-                                <span class="slider"></span>
-                            </label>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="app-window" id="app2-app">
-                <div class="app-content">
-                    <h1 class="settings-title">App Two</h1>
-                    <p style="color: var(--sec-text); font-size: 14px;">Placeholder workspace viewport content.</p>
+                <div class="app-window" id="app2-app">
+                    <div class="app-content">
+                        <h1 class="settings-title">App Two</h1>
+                        <p style="color: var(--sec-text); font-size: 14px;">Placeholder workspace viewport content.</p>
+                    </div>
                 </div>
-            </div>
 
-            <div class="nav-bar" id="nav-bar">
-                <div class="gesture-line" id="gesture-line"></div>
-            </div>
+                <div class="nav-bar" id="nav-bar">
+                    <div class="gesture-line" id="gesture-line"></div>
+                </div>
 
+            </div>
         </div>
     </div>
 
@@ -507,20 +629,29 @@
         const navBar = document.getElementById('nav-bar');
         const gestureLine = document.getElementById('gesture-line');
         const statusClock = document.getElementById('status-clock');
-        const searchBar = document.getElementById('search-bar');
         const darkThemeToggle = document.getElementById('dark-theme-toggle');
         const soundToggle = document.getElementById('sound-toggle');
         const soundStatus = document.getElementById('sound-status');
 
+        const hardwarePower = document.getElementById('hardware-power');
+        const displaySleepLayer = document.getElementById('display-sleep-layer');
+        const lockscreenLayer = document.getElementById('lockscreen-layer');
+        const lockClockText = document.getElementById('lock-clock-text');
+
+        let isPhoneOn = false; 
+        let isLocked = true;
         let activeApp = null;
         let isAppOpen = false;
         let startY = 0, currentY = 0, isDragging = false;
+        let lockStartY = 0, lockCurrentY = 0, isDraggingLock = false;
         let settingsTransformState = "";
         let app2TransformState = "";
 
         function updateClock() {
             const now = new Date();
-            statusClock.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            const timeStr = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+            statusClock.textContent = timeStr;
+            lockClockText.textContent = timeStr;
         }
         setInterval(updateClock, 1000);
         updateClock();
@@ -552,12 +683,32 @@
         window.addEventListener('resize', setAppWindowPositions);
 
         function openApp(appTarget) {
-            if (isDraggingIcon || isAppOpen) return; 
+            if (isDraggingIcon || isAppOpen || isLocked || !isPhoneOn) return; 
             activeApp = appTarget;
             isAppOpen = true;
             screen.classList.add('app-open');
             appTarget.classList.add('open');
         }
+
+        // Power Button Controller
+        hardwarePower.addEventListener('click', () => {
+            if (isPhoneOn) {
+                isPhoneOn = false;
+                isLocked = true;
+                screen.classList.add('locked');
+                displaySleepLayer.style.display = 'block';
+                lockscreenLayer.style.display = 'none';
+                closeActiveApp();
+            } else {
+                isPhoneOn = true;
+                isLocked = true;
+                screen.classList.add('locked');
+                displaySleepLayer.style.display = 'none';
+                lockscreenLayer.style.display = 'flex';
+                lockscreenLayer.style.transform = '';
+                lockscreenLayer.style.opacity = '1';
+            }
+        });
 
         // App Icon Drag Logic
         let holdTimer = null;
@@ -567,9 +718,8 @@
         let holdTriggered = false;
 
         document.querySelectorAll('.draggable-icon').forEach(element => {
-            
             function handlePressStart(e, clientX, clientY) {
-                if (isAppOpen) return;
+                if (isAppOpen || isLocked || !isPhoneOn) return;
                 holdTriggered = false;
                 element.classList.add('hold-active');
 
@@ -594,7 +744,7 @@
                 let localY = clientY - screenRect.top - dragOffset.y;
                 
                 const maxLeft = screenRect.width - element.offsetWidth;
-                const maxTop = screenRect.height - element.offsetHeight;
+                const maxTop = screenRect.height - element.offsetHeight - 48; 
                 
                 if (localX < 0) localX = 0;
                 if (localX > maxLeft) localX = maxLeft;
@@ -648,63 +798,107 @@
             });
         });
 
-        // Swipe Up Gesture Controller
-        function gestureStart(clientY) {
-            if (!isAppOpen || !activeApp) return;
+        // Swipe Controllers
+        function gestureStartAppClose(clientY) {
+            if (!isPhoneOn || isLocked || !isAppOpen || !activeApp) return;
             startY = clientY;
             currentY = startY;
             isDragging = true;
             activeApp.classList.add('dragging');
         }
 
+        function gestureStartUnlock(clientY) {
+            if (!isPhoneOn || !isLocked) return;
+            lockStartY = clientY;
+            lockCurrentY = lockStartY;
+            isDraggingLock = true;
+            lockscreenLayer.classList.add('dragging');
+        }
+
         function gestureMove(e, clientY) {
-            if (!isDragging || !activeApp) return;
-            currentY = clientY;
-            let deltaY = startY - clientY;
-            if (deltaY > 0) {
-                if (e && e.cancelable) e.preventDefault();
-                let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
-                let radiusFactor = Math.min(38, 28 + (deltaY / 12));
-                activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
-                activeApp.style.borderRadius = `${radiusFactor}px`;
-                gestureLine.style.transform = `translateY(${-deltaY * 0.25}px)`;
+            if (!isPhoneOn) return;
+
+            if (isDraggingLock) {
+                lockCurrentY = clientY;
+                let deltaY = lockStartY - clientY;
+                if (deltaY > 0) {
+                    if (e && e.cancelable) e.preventDefault();
+                    lockscreenLayer.style.transform = `translateY(${-deltaY}px)`;
+                    lockscreenLayer.style.opacity = Math.max(0, 1 - (deltaY / 300));
+                }
+            } else if (isDragging && activeApp) {
+                currentY = clientY;
+                let deltaY = startY - clientY;
+                if (deltaY > 0) {
+                    if (e && e.cancelable) e.preventDefault();
+                    let scaleFactor = Math.max(0.75, 1 - (deltaY / 600));
+                    let radiusFactor = Math.min(38, 28 + (deltaY / 12));
+                    activeApp.style.transform = `translateY(${-deltaY}px) scale(${scaleFactor})`;
+                    activeApp.style.borderRadius = `${radiusFactor}px`;
+                    gestureLine.style.transform = `translateY(${-deltaY * 0.25}px)`;
+                }
             }
         }
 
         function gestureEnd() {
-            if (!isDragging || !activeApp) return;
-            isDragging = false;
-            activeApp.classList.remove('dragging');
-            let deltaY = startY - currentY;
-            
-            if (deltaY > 45) { 
-                closeActiveApp(); 
-            } else {
-                activeApp.style.transform = '';
-                activeApp.style.borderRadius = '';
-                gestureLine.style.transform = '';
+            if (isDraggingLock) {
+                isDraggingLock = false;
+                lockscreenLayer.classList.remove('dragging');
+                let deltaY = lockStartY - lockCurrentY;
+                
+                if (deltaY > 60) {
+                    isLocked = false;
+                    screen.classList.remove('locked');
+                    lockscreenLayer.style.display = 'none';
+                    screen.classList.add('unlocking-zoom');
+                    setTimeout(() => {
+                        screen.classList.remove('unlocking-zoom');
+                    }, 350);
+                } else {
+                    lockscreenLayer.style.transform = '';
+                    lockscreenLayer.style.opacity = '1';
+                }
+            } else if (isDragging && activeApp) {
+                isDragging = false;
+                activeApp.classList.remove('dragging');
+                let deltaY = startY - currentY;
+                
+                if (deltaY > 45) { 
+                    closeActiveApp(); 
+                } else {
+                    activeApp.style.transform = '';
+                    activeApp.style.borderRadius = '';
+                    gestureLine.style.transform = '';
+                }
             }
         }
 
-        navBar.addEventListener('touchstart', (e) => { 
-            gestureStart(e.touches[0].clientY); 
-        }, { passive: true });
-        
+        // Global Touch Handlers
         window.addEventListener('touchmove', (e) => { 
-            if(isDragging) gestureMove(e, e.touches[0].clientY);
+            if(isDragging || isDraggingLock) gestureMove(e, e.touches[0].clientY);
         }, { passive: false });
         
-        // Changed to changedTouches target array so mobile recognizes the calculation upon release
         window.addEventListener('touchend', (e) => {
-            if (isDragging && e.changedTouches && e.changedTouches.length > 0) {
-                currentY = e.changedTouches[0].clientY;
-            }
+            if (isDragging && e.changedTouches && e.changedTouches.length > 0) currentY = e.changedTouches[0].clientY;
+            if (isDraggingLock && e.changedTouches && e.changedTouches.length > 0) lockCurrentY = e.changedTouches[0].clientY;
             gestureEnd();
         });
 
+        // App Close Bottom Bar Triggers
+        navBar.addEventListener('touchstart', (e) => gestureStartAppClose(e.touches[0].clientY), { passive: true });
         navBar.addEventListener('mousedown', (e) => {
-            gestureStart(e.clientY);
-            const mm = (ev) => { currentY = ev.clientY; gestureMove(ev, ev.clientY); };
+            gestureStartAppClose(e.clientY);
+            const mm = (ev) => { if (isDragging) currentY = ev.clientY; gestureMove(ev, ev.clientY); };
+            const mu = () => { gestureEnd(); window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); };
+            window.addEventListener('mousemove', mm);
+            window.addEventListener('mouseup', mu);
+        });
+
+        // Lockscreen Unlock Triggers
+        lockscreenLayer.addEventListener('touchstart', (e) => gestureStartUnlock(e.touches[0].clientY), { passive: true });
+        lockscreenLayer.addEventListener('mousedown', (e) => {
+            gestureStartUnlock(e.clientY);
+            const mm = (ev) => { if (isDraggingLock) lockCurrentY = ev.clientY; gestureMove(ev, ev.clientY); };
             const mu = () => { gestureEnd(); window.removeEventListener('mousemove', mm); window.removeEventListener('mouseup', mu); };
             window.addEventListener('mousemove', mm);
             window.addEventListener('mouseup', mu);
