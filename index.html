@@ -11,6 +11,9 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             user-select: none;
+            /* Removes the blue tap/click highlights completely */
+            -webkit-tap-highlight-color: transparent; 
+            outline: none;
         }
 
         body {
@@ -112,7 +115,7 @@
             text-shadow: 0 2px 4px rgba(0,0,0,0.6);
         }
 
-        /* Fixed Geometric Window Scaling using transform-origin matching */
+        /* Fixed Geometric Window Scaling */
         .app-window {
             position: absolute;
             z-index: 5;
@@ -127,7 +130,7 @@
             opacity: 0;
             transform: scale(0);
             pointer-events: none;
-            overflow: hidden;
+            overflow: hidden; /* Stops scrolling leak */
             
             /* Smooth 1.0s non-bouncy animation */
             transition: transform 1.0s cubic-bezier(0.25, 1, 0.5, 1),
@@ -143,7 +146,7 @@
             pointer-events: auto;
         }
 
-        /* Content scaling control */
+        /* Content layout wrapper */
         .app-content {
             width: 100%;
             height: 100%;
@@ -151,6 +154,7 @@
             display: flex;
             flex-direction: column;
             opacity: 0;
+            overflow: hidden; /* Extra lock to remove any hidden scrolling components */
             transition: opacity 0.4s ease;
         }
         
@@ -179,7 +183,7 @@
             font-size: 16px;
         }
 
-        /* Bottom Swipe Gesture Zone */
+        /* Bottom Persistent Gesture Zone (Anchored to Screen Base) */
         .gesture-zone {
             position: absolute;
             bottom: 0;
@@ -190,8 +194,9 @@
             justify-content: center;
             align-items: center;
             background: transparent;
-            z-index: 100;
+            z-index: 100; /* Stays above homescreen AND app-window */
             touch-action: none;
+            cursor: grab;
         }
 
         .gesture-line {
@@ -200,6 +205,7 @@
             background-color: #ffffff;
             border-radius: 10px;
             opacity: 0.8;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
         }
     </style>
 </head>
@@ -232,10 +238,10 @@
                         <li class="settings-item"><span>About FolkUI</span><span>›</span></li>
                     </ul>
                 </div>
+            </div>
 
-                <div class="gesture-zone" id="gesture-bar">
-                    <div class="gesture-line"></div>
-                </div>
+            <div class="gesture-zone" id="gesture-bar">
+                <div class="gesture-line"></div>
             </div>
 
         </div>
@@ -251,19 +257,16 @@
         let startY = 0;
         let isDragging = false;
 
-        // Directly calculates and shifts the window's transform origin directly onto the center point of the icon
         function recalculateTransformOrigin() {
             const iconRect = iconShape.getBoundingClientRect();
             const screenRect = phoneScreen.getBoundingClientRect();
 
-            // Calculate exact center coordinates relative to the screen bounds
             const xOrigin = (iconRect.left + (iconRect.width / 2)) - screenRect.left;
             const yOrigin = (iconRect.top + (iconRect.height / 2)) - screenRect.top;
 
             settingsApp.style.transformOrigin = `${xOrigin}px ${yOrigin}px`;
         }
 
-        // Set origin points on boot
         window.addEventListener('load', recalculateTransformOrigin);
         window.addEventListener('resize', recalculateTransformOrigin);
 
@@ -271,15 +274,13 @@
         settingsIcon.addEventListener('click', () => {
             recalculateTransformOrigin();
             
-            // Clean dynamic runtime styles
             settingsApp.style.transform = '';
             settingsApp.style.borderRadius = '';
             settingsApp.style.opacity = '';
             
-            // Reapply CSS master transitions timeline layout
             settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
             
-            settingsApp.getBoundingClientRect(); // Layout engine flush
+            settingsApp.getBoundingClientRect(); 
             settingsApp.classList.add('active');
         });
 
@@ -294,9 +295,12 @@
         window.addEventListener('touchend', endDrag);
 
         function startDrag(e) {
+            // Only handle drag inputs if the app window is currently fully opened
+            if (!settingsApp.classList.contains('active')) return;
+            
             isDragging = true;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
-            settingsApp.style.transition = 'none'; // Kill animations during layout drags
+            settingsApp.style.transition = 'none'; 
         }
 
         function doDrag(e) {
@@ -307,7 +311,6 @@
 
             if (deltaY < 0) {
                 const screenHeight = phoneScreen.clientHeight;
-                // Calculate scale shift from current finger drag displacement
                 const progress = Math.min(Math.abs(deltaY) / (screenHeight * 0.5), 1);
                 
                 const calculatedScale = 1 - (progress * 0.5);
@@ -329,13 +332,11 @@
             const deltaY = currentY - startY;
 
             if (deltaY < -60) {
-                // Swipe trigger achieved: remove active status class, shrink to transform-origin point
                 settingsApp.classList.remove('active');
                 settingsApp.style.transform = 'scale(0)';
                 settingsApp.style.borderRadius = '32px';
                 settingsApp.style.opacity = '0';
             } else {
-                // Snap safely back to operational full scale layout
                 settingsApp.style.transform = 'scale(1)';
                 settingsApp.style.borderRadius = '0px';
                 settingsApp.style.opacity = '1';
