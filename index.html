@@ -25,7 +25,7 @@
             overflow: hidden;
         }
 
-        /* Smaller, sleeker Phone Frame */
+        /* Sleek Phone Frame */
         .phone-frame {
             width: 320px;
             height: 620px;
@@ -74,7 +74,7 @@
             background-position: center;
             z-index: 1;
             transform: scale(1);
-            transition: transform 1.0s cubic-bezier(0.25, 1, 0.5, 1);
+            will-change: transform;
         }
 
         /* Status Bar */
@@ -91,6 +91,7 @@
             top: 0;
             z-index: 10;
             text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+            pointer-events: none;
         }
 
         /* Home Screen Container */
@@ -154,21 +155,12 @@
             height: 100%;
             border-radius: 28px;
             
+            /* Core architectural properties */
             opacity: 0;
             transform: scale(0);
             pointer-events: none;
             overflow: hidden;
-            
-            transition: transform 1.0s cubic-bezier(0.25, 1, 0.5, 1),
-                        border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1),
-                        opacity 0.8s ease;
-        }
-
-        .app-window.active {
-            opacity: 1;
-            transform: scale(1);
-            border-radius: 0px; 
-            pointer-events: auto;
+            will-change: transform, opacity, border-radius;
         }
 
         .app-content {
@@ -177,13 +169,7 @@
             padding-top: 55px;
             display: flex;
             flex-direction: column;
-            opacity: 0;
             overflow: hidden;
-            transition: opacity 0.4s ease;
-        }
-        
-        .app-window.active .app-content {
-            opacity: 1;
         }
 
         .settings-header {
@@ -284,63 +270,57 @@
 
         let startY = 0;
         let isDragging = false;
+        let isAppOpen = false;
 
         function recalculateTransformOrigin() {
             const iconRect = iconShape.getBoundingClientRect();
             const screenRect = phoneScreen.getBoundingClientRect();
-
             const xOrigin = (iconRect.left + (iconRect.width / 2)) - screenRect.left;
             const yOrigin = (iconRect.top + (iconRect.height / 2)) - screenRect.top;
-
             settingsApp.style.transformOrigin = `${xOrigin}px ${yOrigin}px`;
         }
 
         window.addEventListener('load', recalculateTransformOrigin);
         window.addEventListener('resize', recalculateTransformOrigin);
 
-        // Open app action - configured to interrupt previous states instantly
+        // Core Trigger Engine - Pure style overrides to allow hyper-spam execution
         settingsIcon.addEventListener('click', () => {
+            if (isAppOpen) return; 
+            isAppOpen = true;
+            
             recalculateTransformOrigin();
+            settingsApp.style.pointerEvents = 'auto';
             
-            settingsApp.style.transform = '';
-            settingsApp.style.borderRadius = '';
-            settingsApp.style.opacity = '';
-            
-            // Reapply layout transition timelines cleanly
+            // Apply clean 1.0s slow smooth curves
             settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
             wallpaperBg.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
             
-            settingsApp.getBoundingClientRect(); 
-            settingsApp.classList.add('active');
-            
-            // Zoom wallpaper background out slightly to mimic UI depth
+            // Trigger layout transitions instantly
+            settingsApp.style.transform = 'scale(1)';
+            settingsApp.style.borderRadius = '0px';
+            settingsApp.style.opacity = '1';
             wallpaperBg.style.transform = 'scale(1.15)';
         });
 
-        // Drag handlers
         gestureBar.addEventListener('mousedown', startDrag);
         gestureBar.addEventListener('touchstart', startDrag);
-
         window.addEventListener('mousemove', doDrag);
         window.addEventListener('touchmove', doDrag);
-
         window.addEventListener('mouseup', endDrag);
         window.addEventListener('touchend', endDrag);
 
         function startDrag(e) {
-            if (!settingsApp.classList.contains('active')) return;
-            
+            if (!isAppOpen) return;
             isDragging = true;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
             
-            // Turn off style transitions immediately for instant click/drag responsiveness when spamming
+            // Strip transitions completely so drag intercepts the animation position instantly
             settingsApp.style.transition = 'none'; 
             wallpaperBg.style.transition = 'none';
         }
 
         function doDrag(e) {
             if (!isDragging) return;
-            
             const currentY = e.touches ? e.touches[0].clientY : e.clientY;
             const deltaY = currentY - startY;
 
@@ -348,15 +328,9 @@
                 const screenHeight = phoneScreen.clientHeight;
                 const progress = Math.min(Math.abs(deltaY) / (screenHeight * 0.5), 1);
                 
-                const calculatedScale = 1 - (progress * 0.5);
-                const calculatedBorder = progress * 28;
-                
-                // Real-time gesture rendering adjustments
-                settingsApp.style.transform = `scale(${calculatedScale})`;
-                settingsApp.style.borderRadius = `${calculatedBorder}px`;
-                settingsApp.style.opacity = 1 - (progress * 0.4);
-                
-                // Track finger depth scale values for wallpaper zoom matching
+                settingsApp.style.transform = `scale(${1 - (progress * 0.5)})`;
+                settingsApp.style.borderRadius = `${progress * 28}px`;
+                settingsApp.style.opacity = `${1 - (progress * 0.4)}`;
                 wallpaperBg.style.transform = `scale(${1.15 - (progress * 0.15)})`;
             }
         }
@@ -365,7 +339,6 @@
             if (!isDragging) return;
             isDragging = false;
             
-            // Return default slow system transition timing parameters
             settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
             wallpaperBg.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
             
@@ -373,12 +346,12 @@
             const deltaY = currentY - startY;
 
             if (deltaY < -60) {
-                settingsApp.classList.remove('active');
+                isAppOpen = false;
+                settingsApp.style.pointerEvents = 'none';
+                
                 settingsApp.style.transform = 'scale(0)';
                 settingsApp.style.borderRadius = '28px';
                 settingsApp.style.opacity = '0';
-                
-                // Wallpaper snaps back home
                 wallpaperBg.style.transform = 'scale(1)';
             } else {
                 settingsApp.style.transform = 'scale(1)';
