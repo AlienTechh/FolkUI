@@ -11,7 +11,6 @@
             padding: 0;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             user-select: none;
-            /* Removes the blue tap/click highlights completely */
             -webkit-tap-highlight-color: transparent; 
             outline: none;
         }
@@ -23,19 +22,34 @@
             align-items: center;
             min-height: 100vh;
             color: white;
+            overflow: hidden;
         }
 
-        /* Phone Frame */
+        /* Smaller, sleeker Phone Frame */
         .phone-frame {
-            width: 375px;
-            height: 712px;
+            width: 320px;
+            height: 620px;
             background-color: #000;
-            border: 12px solid #2d2d30;
-            border-radius: 44px;
+            border: 10px solid #2d2d30;
+            border-radius: 40px;
             position: relative;
             overflow: hidden;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
             outline: 2px solid #1a1a1c;
+        }
+
+        /* Hardware Punch Hole Camera */
+        .punch-hole {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 13px;
+            height: 13px;
+            background-color: #000;
+            border-radius: 50%;
+            z-index: 110;
+            pointer-events: none;
         }
 
         /* Screen Wrapper */
@@ -43,38 +57,53 @@
             width: 100%;
             height: 100%;
             position: relative;
-            border-radius: 32px;
+            border-radius: 28px;
             overflow: hidden;
+            background-color: #000;
+        }
+
+        /* Dynamic Wallpaper Underlay */
+        .wallpaper-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background-image: url('https://preview.redd.it/tz6jhopl0d5h1.jpeg?width=640&crop=smart&auto=webp&s=8fc4a8f82d8652dc2437a1ef6df146e444e00f5b');
             background-size: cover;
             background-position: center;
+            z-index: 1;
+            transform: scale(1);
+            transition: transform 1.0s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        /* Status Bar Simulation */
+        /* Status Bar */
         .status-bar {
-            height: 40px;
+            height: 35px;
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 24px;
-            font-size: 14px;
+            padding: 0 20px;
+            font-size: 12px;
             font-weight: 600;
             position: absolute;
             top: 0;
             z-index: 10;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
         }
 
-        /* Home Screen Layout */
+        /* Home Screen Container */
         .home-screen {
+            position: relative;
+            z-index: 2;
             width: 100%;
             height: 100%;
-            padding: 60px 24px 24px 24px;
+            padding: 55px 20px 20px 20px;
             display: grid;
             grid-template-columns: repeat(4, 1fr);
             grid-auto-rows: max-content;
-            gap: 22px;
+            gap: 18px;
         }
 
         .app-icon {
@@ -82,40 +111,39 @@
             flex-direction: column;
             align-items: center;
             cursor: pointer;
-            position: relative;
         }
 
         .icon-shape {
-            width: 60px;
-            height: 60px;
-            border-radius: 16px;
+            width: 52px;
+            height: 52px;
+            border-radius: 14px;
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
             transition: transform 0.1s;
         }
 
         .app-icon:active .icon-shape {
-            transform: scale(0.9);
+            transform: scale(0.92);
         }
 
         .icon-shape.settings {
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.15);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
 
         .app-label {
-            margin-top: 8px;
-            font-size: 12px;
+            margin-top: 6px;
+            font-size: 11px;
             text-align: center;
             font-weight: 500;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.7);
         }
 
-        /* Fixed Geometric Window Scaling */
+        /* Clean System Interface Window */
         .app-window {
             position: absolute;
             z-index: 5;
@@ -124,21 +152,18 @@
             left: 0;
             width: 100%;
             height: 100%;
-            border-radius: 32px;
+            border-radius: 28px;
             
-            /* Start state: zero scale, completely invisible */
             opacity: 0;
             transform: scale(0);
             pointer-events: none;
-            overflow: hidden; /* Stops scrolling leak */
+            overflow: hidden;
             
-            /* Smooth 1.0s non-bouncy animation */
             transition: transform 1.0s cubic-bezier(0.25, 1, 0.5, 1),
                         border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1),
                         opacity 0.8s ease;
         }
 
-        /* Active State */
         .app-window.active {
             opacity: 1;
             transform: scale(1);
@@ -146,15 +171,14 @@
             pointer-events: auto;
         }
 
-        /* Content layout wrapper */
         .app-content {
             width: 100%;
             height: 100%;
-            padding-top: 60px;
+            padding-top: 55px;
             display: flex;
             flex-direction: column;
             opacity: 0;
-            overflow: hidden; /* Extra lock to remove any hidden scrolling components */
+            overflow: hidden;
             transition: opacity 0.4s ease;
         }
         
@@ -163,45 +187,45 @@
         }
 
         .settings-header {
-            padding: 0 24px 16px 24px;
-            font-size: 28px;
+            padding: 0 20px 12px 20px;
+            font-size: 24px;
             font-weight: 700;
             border-bottom: 1px solid #2c2c2e;
         }
 
         .settings-menu {
             list-style: none;
-            padding: 12px 24px;
+            padding: 8px 20px;
         }
 
         .settings-item {
-            padding: 16px 0;
+            padding: 14px 0;
             border-bottom: 1px solid #2c2c2e;
             display: flex;
             justify-content: space-between;
             color: #fff;
-            font-size: 16px;
+            font-size: 14px;
         }
 
-        /* Bottom Persistent Gesture Zone (Anchored to Screen Base) */
+        /* Gesture Handle Zone */
         .gesture-zone {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 40px;
+            height: 35px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: transparent;
-            z-index: 100; /* Stays above homescreen AND app-window */
+            z-index: 100;
             touch-action: none;
             cursor: grab;
         }
 
         .gesture-line {
-            width: 135px;
-            height: 5px;
+            width: 110px;
+            height: 4px;
             background-color: #ffffff;
             border-radius: 10px;
             opacity: 0.8;
@@ -212,7 +236,10 @@
 <body>
 
     <div class="phone-frame">
+        <div class="punch-hole"></div>
+        
         <div class="screen">
+            <div class="wallpaper-bg" id="phone-wp"></div>
             
             <div class="status-bar">
                 <span>9:41</span>
@@ -222,7 +249,7 @@
             <div class="home-screen">
                 <div class="app-icon" id="settings-icon">
                     <div class="icon-shape settings">
-                        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </div>
                     <div class="app-label">Settings</div>
                 </div>
@@ -253,6 +280,7 @@
         const settingsApp = document.getElementById('settings-app');
         const gestureBar = document.getElementById('gesture-bar');
         const phoneScreen = document.querySelector('.screen');
+        const wallpaperBg = document.getElementById('phone-wp');
 
         let startY = 0;
         let isDragging = false;
@@ -270,7 +298,7 @@
         window.addEventListener('load', recalculateTransformOrigin);
         window.addEventListener('resize', recalculateTransformOrigin);
 
-        // Open app action
+        // Open app action - configured to interrupt previous states instantly
         settingsIcon.addEventListener('click', () => {
             recalculateTransformOrigin();
             
@@ -278,13 +306,18 @@
             settingsApp.style.borderRadius = '';
             settingsApp.style.opacity = '';
             
+            // Reapply layout transition timelines cleanly
             settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
+            wallpaperBg.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
             
             settingsApp.getBoundingClientRect(); 
             settingsApp.classList.add('active');
+            
+            // Zoom wallpaper background out slightly to mimic UI depth
+            wallpaperBg.style.transform = 'scale(1.15)';
         });
 
-        // Touch tracking configuration
+        // Drag handlers
         gestureBar.addEventListener('mousedown', startDrag);
         gestureBar.addEventListener('touchstart', startDrag);
 
@@ -295,12 +328,14 @@
         window.addEventListener('touchend', endDrag);
 
         function startDrag(e) {
-            // Only handle drag inputs if the app window is currently fully opened
             if (!settingsApp.classList.contains('active')) return;
             
             isDragging = true;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
+            
+            // Turn off style transitions immediately for instant click/drag responsiveness when spamming
             settingsApp.style.transition = 'none'; 
+            wallpaperBg.style.transition = 'none';
         }
 
         function doDrag(e) {
@@ -314,11 +349,15 @@
                 const progress = Math.min(Math.abs(deltaY) / (screenHeight * 0.5), 1);
                 
                 const calculatedScale = 1 - (progress * 0.5);
-                const calculatedBorder = progress * 32;
-
+                const calculatedBorder = progress * 28;
+                
+                // Real-time gesture rendering adjustments
                 settingsApp.style.transform = `scale(${calculatedScale})`;
                 settingsApp.style.borderRadius = `${calculatedBorder}px`;
                 settingsApp.style.opacity = 1 - (progress * 0.4);
+                
+                // Track finger depth scale values for wallpaper zoom matching
+                wallpaperBg.style.transform = `scale(${1.15 - (progress * 0.15)})`;
             }
         }
 
@@ -326,7 +365,9 @@
             if (!isDragging) return;
             isDragging = false;
             
+            // Return default slow system transition timing parameters
             settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
+            wallpaperBg.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
             
             const currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
             const deltaY = currentY - startY;
@@ -334,12 +375,16 @@
             if (deltaY < -60) {
                 settingsApp.classList.remove('active');
                 settingsApp.style.transform = 'scale(0)';
-                settingsApp.style.borderRadius = '32px';
+                settingsApp.style.borderRadius = '28px';
                 settingsApp.style.opacity = '0';
+                
+                // Wallpaper snaps back home
+                wallpaperBg.style.transform = 'scale(1)';
             } else {
                 settingsApp.style.transform = 'scale(1)';
                 settingsApp.style.borderRadius = '0px';
                 settingsApp.style.opacity = '1';
+                wallpaperBg.style.transform = 'scale(1.15)';
             }
         }
     </script>
