@@ -25,7 +25,6 @@
             overflow: hidden;
         }
 
-        /* ultra-premium Phone Frame with subtle depth shading */
         .phone-frame {
             width: 320px;
             height: 640px;
@@ -34,12 +33,9 @@
             border-radius: 42px;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.85), 
-                        0 0 0 1px rgba(255, 255, 255, 0.05),
-                        inset 0 0 8px rgba(255,255,255,0.2);
+            box-shadow: 0 50px 100px -20px rgba(0, 0, 0, 0.85);
         }
 
-        /* Dynamic Island / Hardware Punch Hole combination */
         .camera-island {
             position: absolute;
             top: 11px;
@@ -51,23 +47,8 @@
             border-radius: 20px;
             z-index: 110;
             pointer-events: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: inset 0 0 2px rgba(255,255,255,0.1);
         }
 
-        .camera-lens {
-            width: 10px;
-            height: 10px;
-            background: #0d0d1a;
-            border-radius: 50%;
-            position: absolute;
-            right: 12px;
-            box-shadow: inset 0 0 3px #1a73e8;
-        }
-
-        /* Screen Wrapper */
         .screen {
             width: 100%;
             height: 100%;
@@ -77,7 +58,6 @@
             background-color: #000;
         }
 
-        /* Premium Abstract Gradient Wallpaper Layout */
         .wallpaper-bg {
             position: absolute;
             top: -10%;
@@ -90,16 +70,6 @@
             will-change: transform;
         }
 
-        .wallpaper-overlay {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at 80% 20%, rgba(255,255,255,0.15), transparent 50%),
-                        linear-gradient(to bottom, rgba(0,0,0,0.1), rgba(0,0,0,0.4));
-            z-index: 2;
-        }
-
-        /* Status Bar */
         .status-bar {
             height: 40px;
             width: 100%;
@@ -109,36 +79,12 @@
             padding: 4px 22px 0 22px;
             font-size: 11px;
             font-weight: 600;
-            letter-spacing: -0.2px;
             position: absolute;
             top: 0;
             z-index: 100;
-            text-shadow: 0 1px 4px rgba(0,0,0,0.4);
             pointer-events: none;
         }
 
-        .status-right {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-
-        .battery-icon {
-            width: 18px;
-            height: 9px;
-            border: 1px solid white;
-            border-radius: 3px;
-            padding: 1px;
-            display: flex;
-        }
-        .battery-level {
-            width: 85%;
-            height: 100%;
-            background-color: white;
-            border-radius: 1px;
-        }
-
-        /* Home Screen Container */
         .home-screen {
             position: relative;
             z-index: 10;
@@ -165,42 +111,29 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.35), 
-                        inset 0 1px 1px rgba(255,255,255,0.2);
-            transition: transform 0.12s cubic-bezier(0.2, 0, 0.2, 1);
-        }
-
-        .app-icon:active .icon-shape {
-            transform: scale(0.88);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.35);
         }
 
         .icon-shape.settings {
             background: linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.08) 100%);
             backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
             border: 1px solid rgba(255, 255, 255, 0.25);
         }
 
         .app-label {
             margin-top: 7px;
             font-size: 11px;
-            text-align: center;
-            font-weight: 500;
-            letter-spacing: 0.1px;
             text-shadow: 0 2px 6px rgba(0,0,0,0.6);
         }
 
-        /* Glassmorphism System Interface Window */
         .app-window {
             position: absolute;
             z-index: 50;
-            background-color: #000000;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             border-radius: 30px;
-            
             opacity: 0;
             transform: scale(0);
             pointer-events: none;
@@ -214,7 +147,6 @@
             padding-top: 65px;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
             background: linear-gradient(to bottom, #1a1a24, #0f0f15);
         }
 
@@ -222,7 +154,6 @@
             padding: 0 24px 16px 24px;
             font-size: 26px;
             font-weight: 700;
-            letter-spacing: -0.5px;
         }
 
         .settings-menu {
@@ -237,30 +168,20 @@
             border-radius: 12px;
             display: flex;
             justify-content: space-between;
-            color: #fff;
             font-size: 14px;
-            font-weight: 500;
-            border: 1px solid rgba(255, 255, 255, 0.02);
         }
 
-        .settings-item span:last-child {
-            color: #8e8e93;
-            font-weight: 400;
-        }
-
-        /* Fluid Gesture Navigation Zone - HIGH LAYER FIX */
         .gesture-zone {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 38px;
+            height: 45px;
             display: flex;
             justify-content: center;
             align-items: center;
             background: transparent;
-            z-index: 999; /* Forces layer layout above absolutely everything */
-            touch-action: none;
+            z-index: 999; 
             cursor: grab;
         }
 
@@ -269,34 +190,27 @@
             height: 5px;
             background-color: rgba(255, 255, 255, 0.85);
             border-radius: 10px;
-            box-shadow: 0 1px 5px rgba(0,0,0,0.5);
+            pointer-events: none;
         }
     </style>
 </head>
 <body>
 
     <div class="phone-frame">
-        <div class="camera-island">
-            <div class="camera-lens"></div>
-        </div>
+        <div class="camera-island"></div>
         
         <div class="screen">
-            <div class="wallpaper-bg" id="phone-wp">
-                <div class="wallpaper-overlay"></div>
-            </div>
+            <div class="wallpaper-bg" id="phone-wp"></div>
             
             <div class="status-bar">
                 <span>9:41</span>
-                <div class="status-right">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="white"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.22 19.58 10.57 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-                    <div class="battery-icon"><div class="battery-level"></div></div>
-                </div>
+                <span>100%</span>
             </div>
 
             <div class="home-screen">
                 <div class="app-icon" id="settings-icon">
                     <div class="icon-shape settings">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.2"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
                     </div>
                     <div class="app-label">Settings</div>
                 </div>
@@ -306,10 +220,8 @@
                 <div class="app-content">
                     <div class="settings-header">Settings</div>
                     <ul class="settings-menu">
-                        <li class="settings-item"><span>Wi-Fi</span><span>FolkNet Pro ›</span></li>
-                        <li class="settings-item"><span>Bluetooth</span><span>Connected ›</span></li>
-                        <li class="settings-item"><span>Wallpaper Style</span><span>Fluid Glass ›</span></li>
-                        <li class="settings-item"><span>System Version</span><span>FolkUI 4.0 ›</span></li>
+                        <li class="settings-item"><span>Wi-Fi</span><span>Connected ›</span></li>
+                        <li class="settings-item"><span>Bluetooth</span><span>On ›</span></li>
                     </ul>
                 </div>
             </div>
@@ -331,90 +243,65 @@
 
         let startY = 0;
         let isDragging = false;
-        let isAppOpen = false;
 
-        function recalculateTransformOrigin() {
+        function setOrigin() {
             const iconRect = iconShape.getBoundingClientRect();
             const screenRect = phoneScreen.getBoundingClientRect();
-            const xOrigin = (iconRect.left + (iconRect.width / 2)) - screenRect.left;
-            const yOrigin = (iconRect.top + (iconRect.height / 2)) - screenRect.top;
-            settingsApp.style.transformOrigin = `${xOrigin}px ${yOrigin}px`;
+            settingsApp.style.transformOrigin = `${(iconRect.left + iconRect.width/2) - screenRect.left}px ${(iconRect.top + iconRect.height/2) - screenRect.top}px`;
         }
 
-        window.addEventListener('load', recalculateTransformOrigin);
-        window.addEventListener('resize', recalculateTransformOrigin);
-
         settingsIcon.addEventListener('click', () => {
-            if (isAppOpen) return; 
-            isAppOpen = true;
-            
-            recalculateTransformOrigin();
+            setOrigin();
             settingsApp.style.pointerEvents = 'auto';
+            settingsApp.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-radius 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease';
+            wallpaperBg.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
             
-            settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.8s ease';
-            wallpaperBg.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
-            
-            settingsApp.style.transform = 'scale(1)';
+            settingsApp.style.transform = 'scale(1) translateY(0px)';
             settingsApp.style.borderRadius = '0px';
             settingsApp.style.opacity = '1';
             wallpaperBg.style.transform = 'scale(1.12)';
         });
 
+        function closeApp() {
+            settingsApp.style.pointerEvents = 'none';
+            settingsApp.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1), border-radius 0.4s cubic-bezier(0.25, 1, 0.5, 1), opacity 0.3s ease';
+            wallpaperBg.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
+            
+            settingsApp.style.transform = 'scale(0) translateY(0px)';
+            settingsApp.style.borderRadius = '30px';
+            settingsApp.style.opacity = '0';
+            wallpaperBg.style.transform = 'scale(1)';
+        }
+
         gestureBar.addEventListener('mousedown', startDrag);
         gestureBar.addEventListener('touchstart', startDrag);
         window.addEventListener('mousemove', doDrag);
-        window.addEventListener('touchmove', doDrag);
+        window.addEventListener('touchmove', doDrag, { passive: false });
         window.addEventListener('mouseup', endDrag);
         window.addEventListener('touchend', endDrag);
 
         function startDrag(e) {
-            if (!isAppOpen) return;
             isDragging = true;
             startY = e.touches ? e.touches[0].clientY : e.clientY;
-            
-            settingsApp.style.transition = 'none'; 
-            wallpaperBg.style.transition = 'none';
+            gestureBar.style.cursor = 'grabbing';
         }
 
         function doDrag(e) {
             if (!isDragging) return;
-            const currentY = e.touches ? e.touches[0].clientY : e.clientY;
-            const deltaY = currentY - startY;
-
-            if (deltaY > 0) {
-                const screenHeight = phoneScreen.clientHeight;
-                const progress = Math.min(deltaY / (screenHeight * 0.4), 1);
-                
-                settingsApp.style.transform = `scale(${1 - (progress * 0.45)}) translateY(${deltaY * 0.35}px)`;
-                settingsApp.style.borderRadius = `${progress * 30}px`;
-                settingsApp.style.opacity = `${1 - (progress * 0.5)}`;
-                wallpaperBg.style.transform = `scale(${1.12 - (progress * 0.12)})`;
-            }
+            // Visual changes are disabled during swipe up. Window stays completely frozen.
         }
 
         function endDrag(e) {
             if (!isDragging) return;
             isDragging = false;
-            
-            settingsApp.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1), border-radius 1.0s cubic-bezier(0.25, 1, 0.5, 1), opacity 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
-            wallpaperBg.style.transition = 'transform 1.0s cubic-bezier(0.25, 1, 0.5, 1)';
+            gestureBar.style.cursor = 'grab';
             
             const currentY = e.changedTouches ? e.changedTouches[0].clientY : e.clientY;
             const deltaY = currentY - startY;
 
-            if (deltaY > 50) {
-                isAppOpen = false;
-                settingsApp.style.pointerEvents = 'none';
-                
-                settingsApp.style.transform = 'scale(0)';
-                settingsApp.style.borderRadius = '30px';
-                settingsApp.style.opacity = '0';
-                wallpaperBg.style.transform = 'scale(1)';
-            } else {
-                settingsApp.style.transform = 'scale(1)';
-                settingsApp.style.borderRadius = '0px';
-                settingsApp.style.opacity = '1';
-                wallpaperBg.style.transform = 'scale(1.12)';
+            // Instantly snaps cleanly into the icon if you cross the upward threshold
+            if (deltaY < -60) {
+                closeApp();
             }
         }
     </script>
