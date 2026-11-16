@@ -1,656 +1,711 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Phone UI Demo</title>
-<style>
-  * { box-sizing: border-box; }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#10131b">
+  <title>      </title>
 
-  :root {
-    --blue: #0a84ff;
-    --glass: #ffffff24;
-    --line: #ffffff30;
-  }
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display",
+        "Segoe UI", sans-serif;
+      --ease-out: cubic-bezier(.16, 1, .3, 1);
+      --ease-in-out: cubic-bezier(.76, 0, .24, 1);
+    }
 
-  body {
-    min-height: 100vh;
-    margin: 0;
-    display: grid;
-    place-items: center;
-    padding: 24px;
-    color: white;
-    background:
-      radial-gradient(ellipse at 15% 10%, #6b47a5 0, transparent 35%),
-      radial-gradient(ellipse at 85% 85%, #aa4d77 0, transparent 38%),
-      linear-gradient(140deg, #151c39, #262043 55%, #132a42);
-    font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", sans-serif;
-  }
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      user-select: none;
+    }
 
-  .device-wrap {
-    position: relative;
-    width: min(405px, 90vw);
-    height: min(850px, 92vh);
-    min-height: 620px;
-  }
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      overscroll-behavior: none;
+      background: #16181d;
+      color: white;
+      touch-action: none;
+    }
 
-  .phone {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    isolation: isolate;
-    border: 7px solid #292a32;
-    border-radius: 52px;
-    background:
-      radial-gradient(ellipse at 16% 20%, #f5a3c7b8, transparent 31%),
-      radial-gradient(ellipse at 85% 32%, #9b8af2d9, transparent 37%),
-      radial-gradient(ellipse at 50% 100%, #e4a0bf88, transparent 40%),
-      linear-gradient(145deg, #4f8bc6, #66549b 54%, #ba6994);
-    box-shadow: 0 36px 100px #0009, inset 0 1px #ffffff70;
-    transition: background .3s;
-  }
+    .stage {
+      width: 100%;
+      height: 100%;
+      display: grid;
+      place-items: center;
+    }
 
-  .phone::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    z-index: -1;
-    background: linear-gradient(135deg, #ffffff14, transparent 45%, #0000001c);
-    pointer-events: none;
-  }
+    .phone {
+      position: relative;
+      width: min(390px, 94vw);
+      height: min(820px, 94vh);
+      padding: 12px;
+      border: 3px solid #555a63;
+      border-radius: 48px;
+      background: #08090c;
+      box-shadow: 0 24px 80px #0009, inset 0 0 0 2px #17181c;
+    }
 
-  /* Clickable side button */
-  .power-button {
-    position: absolute;
-    z-index: 20;
-    top: 155px;
-    right: -13px;
-    width: 12px;
-    height: 76px;
-    padding: 0;
-    border: 0;
-    border-radius: 0 7px 7px 0;
-    background: linear-gradient(90deg, #55565c, #24252b);
-    box-shadow: 3px 2px 5px #0008;
-    cursor: pointer;
-  }
-  .power-button:active { filter: brightness(1.5); }
+    .screen {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      isolation: isolate;
+      border-radius: 36px;
+      background: #203d63;
+      touch-action: none;
+    }
 
-  .status {
-    position: relative;
-    z-index: 2;
-    height: 49px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 24px;
-    font-size: 14px;
-    font-weight: 700;
-    text-shadow: 0 1px 5px #0005;
-  }
-  .island {
-    position: absolute;
-    top: 9px;
-    left: 50%;
-    width: 112px;
-    height: 29px;
-    transform: translateX(-50%);
-    border-radius: 18px;
-    background: #08080b;
-    box-shadow: inset 0 1px 2px #ffffff20;
-  }
-  .status-right { display: flex; gap: 7px; align-items: center; }
+    .wallpaper {
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at 75% 24%, #a1d8ff8c 0 8%, transparent 38%),
+        radial-gradient(ellipse at 22% 68%, #9a79ffad 0 10%, transparent 43%),
+        linear-gradient(145deg, #18325c, #427cb1 52%, #292753);
+    }
 
-  .home {
-    height: calc(100% - 49px);
-    padding: 27px 22px 110px;
-    overflow-y: auto;
-    scrollbar-width: none;
-  }
-  .home::-webkit-scrollbar { display: none; }
+    .status-bar {
+      position: absolute;
+      z-index: 20;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      font-size: 13px;
+      font-weight: 650;
+      pointer-events: none;
+      transition: opacity 240ms ease;
+    }
 
-  .date { margin: 0 0 3px; color: #ffffffd8; font-size: 14px; font-weight: 600; }
-  .greeting { margin: 0 0 17px; font-size: 34px; letter-spacing: -1.5px; }
+    .island {
+      position: absolute;
+      z-index: 21;
+      top: 9px;
+      left: 50%;
+      width: 96px;
+      height: 25px;
+      transform: translateX(-50%);
+      border-radius: 20px;
+      background: #050505;
+      pointer-events: none;
+    }
 
-  .widgets {
-    display: grid;
-    grid-template-columns: 1.2fr .8fr;
-    gap: 11px;
-    margin-bottom: 23px;
-  }
-  .widget {
-    min-height: 105px;
-    padding: 14px;
-    border: 1px solid var(--line);
-    border-radius: 22px;
-    background: #ffffff20;
-    box-shadow: inset 0 1px #ffffff30, 0 8px 24px #17132c2b;
-    backdrop-filter: blur(20px);
-  }
-  .widget-label { color: #ffffffca; font-size: 11px; font-weight: 700; }
-  .weather-main { display: flex; align-items: center; justify-content: space-between; }
-  .temperature { font-size: 39px; font-weight: 300; }
-  .weather-icon { font-size: 31px; }
-  .weather-detail, .calendar-event { color: #ffffffce; font-size: 11px; }
-  .calendar-widget { display: flex; flex-direction: column; justify-content: space-between; }
-  .calendar-day { color: #ffb5bb; font-size: 11px; font-weight: 800; }
-  .calendar-number { font-size: 39px; font-weight: 300; line-height: 1; }
+    .home-screen,
+    .settings-screen,
+    .lock-screen,
+    .off-screen {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
 
-  .section-label {
-    margin: 0 0 12px 3px;
-    color: #ffffffea;
-    font-size: 13px;
-    font-weight: 700;
-  }
-  .app-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px 8px; }
-  .app {
-    min-width: 0;
-    padding: 0;
-    border: 0;
-    color: white;
-    background: none;
-    text-align: center;
-    cursor: pointer;
-    -webkit-tap-highlight-color: transparent;
-  }
-  .icon {
-    width: 59px;
-    height: 59px;
-    display: grid;
-    place-items: center;
-    margin: 0 auto 6px;
-    border: 1px solid #ffffff65;
-    border-radius: 18px;
-    background: var(--color);
-    box-shadow: inset 0 1px 2px #ffffff70, 0 5px 13px #17142855;
-    font-size: 29px;
-    transition: transform .16s;
-  }
-  .app:hover .icon { transform: translateY(-2px) scale(1.04); }
-  .app:active .icon { transform: scale(.88); }
-  .app-name { display: block; overflow: hidden; font-size: 11px; text-shadow: 0 1px 5px #0009; white-space: nowrap; text-overflow: ellipsis; }
+    .home-screen {
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 68px 22px 28px;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition:
+        opacity 250ms ease,
+        transform 500ms var(--ease-out),
+        filter 400ms ease;
+    }
 
-  .dock {
-    position: absolute;
-    right: 14px;
-    bottom: 18px;
-    left: 14px;
-    z-index: 1;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    padding: 11px 6px;
-    border: 1px solid #ffffff48;
-    border-radius: 26px;
-    background: #ffffff30;
-    box-shadow: inset 0 1px #ffffff45, 0 8px 25px #17132c44;
-    backdrop-filter: blur(25px);
-  }
-  .dock .icon { width: 56px; height: 56px; margin-bottom: 0; }
+    .home-screen.apps-dimmed {
+      opacity: 0;
+      transform: scale(.94);
+      filter: blur(8px);
+      pointer-events: none;
+    }
 
-  /* Lock screen */
-  .lock-screen, .off-screen {
-    position: absolute;
-    inset: 0;
-    z-index: 8;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    opacity: 0;
-    visibility: hidden;
-    transition: opacity .3s, visibility .3s;
-  }
-  .lock-screen {
-    padding: 70px 24px 24px;
-    background: linear-gradient(#10152a38, #15152d40);
-    backdrop-filter: blur(5px);
-    touch-action: none;
-  }
-  .lock-screen.visible, .off-screen.visible { opacity: 1; visibility: visible; }
+    .date {
+      margin: 15px 0 8px;
+      font-size: 15px;
+      opacity: .9;
+    }
 
-  .lock-date { margin: 46px 0 0; font-size: 17px; font-weight: 600; text-shadow: 0 2px 10px #0005; }
-  .lock-time {
-    margin: 0;
-    font-size: clamp(76px, 23vw, 104px);
-    line-height: 1.07;
-    font-weight: 200;
-    letter-spacing: -5px;
-    text-shadow: 0 3px 18px #0004;
-  }
-  .lock-widgets {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 28px;
-  }
-  .lock-widget {
-    min-width: 125px;
-    padding: 13px;
-    border: 1px solid #ffffff45;
-    border-radius: 18px;
-    background: #ffffff24;
-    backdrop-filter: blur(18px);
-  }
-  .lock-widget small { display: block; color: #ffffffd0; font-size: 11px; }
-  .lock-widget strong { display: block; margin-top: 4px; font-size: 19px; }
-  .lock-bottom {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    margin-top: auto;
-    padding: 0 12px 23px;
-  }
-  .round-control {
-    width: 49px;
-    height: 49px;
-    border: 1px solid #ffffff50;
-    border-radius: 50%;
-    color: white;
-    background: #22233388;
-    font-size: 21px;
-    backdrop-filter: blur(15px);
-  }
-  .swipe-hint {
-    position: absolute;
-    bottom: 13px;
-    color: #ffffffdc;
-    font-size: 12px;
-    text-shadow: 0 1px 5px #000;
-    animation: hint 1.7s infinite ease-in-out;
-  }
-  @keyframes hint { 50% { transform: translateY(-5px); } }
+    .home-clock {
+      font-size: 54px;
+      font-weight: 300;
+      letter-spacing: -2px;
+    }
 
-  .off-screen {
-    z-index: 12;
-    justify-content: center;
-    background: #000;
-    color: #777;
-    font-size: 13px;
-  }
-  .off-symbol { margin-bottom: 11px; font-size: 26px; }
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 25px 13px;
+      margin-top: 58px;
+    }
 
-  /* Apps expand from the icon that was tapped */
-  .app-screen {
-    position: absolute;
-    inset: 0;
-    z-index: 6;
-    display: flex;
-    flex-direction: column;
-    color: #19191e;
-    background: #f2f2f7;
-    opacity: 0;
-    visibility: hidden;
-    transform: scale(.12);
-    transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
-    border-radius: 48%;
-    transition:
-      transform .42s cubic-bezier(.2,.85,.25,1),
-      opacity .25s ease,
-      border-radius .42s ease,
-      visibility .42s;
-  }
-  .app-screen.visible {
-    opacity: 1;
-    visibility: visible;
-    transform: scale(1);
-    border-radius: 0;
-  }
-  .app-header {
-    min-height: 100px;
-    display: flex;
-    align-items: end;
-    justify-content: space-between;
-    padding: 0 20px 15px;
-    background: #f2f2f7;
-  }
-  .app-header h2 { margin: 0; font-size: 30px; letter-spacing: -.7px; }
-  .done {
-    padding: 8px 14px;
-    border: 0;
-    border-radius: 20px;
-    color: #087aff;
-    background: #e4e4eb;
-    font-weight: 650;
-  }
-  .app-content { flex: 1; overflow: auto; padding: 10px 16px 24px; }
-  .group { margin-bottom: 18px; overflow: hidden; border-radius: 14px; background: white; }
-  .group-title { margin: 0; padding: 16px 14px 8px; color: #74747b; font-size: 12px; font-weight: 700; }
-  .row { min-height: 53px; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 10px 14px; border-bottom: 1px solid #ededf0; font-size: 15px; }
-  .row:last-child { border-bottom: 0; }
-  .row-left { display: flex; align-items: center; gap: 10px; }
-  .row-icon { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 8px; color: white; background: #508af4; }
-  .search, .note-editor { width: 100%; padding: 13px; border: 0; border-radius: 12px; outline: none; background: #e5e5eb; }
-  .switch { position: relative; width: 44px; height: 26px; }
-  .switch input { width: 0; height: 0; opacity: 0; }
-  .switch span { position: absolute; inset: 0; border-radius: 20px; background: #d1d1d6; cursor: pointer; transition: .2s; }
-  .switch span::before { content: ""; position: absolute; top: 2px; left: 2px; width: 22px; height: 22px; border-radius: 50%; background: white; box-shadow: 0 1px 4px #0003; transition: .2s; }
-  .switch input:checked + span { background: #34c759; }
-  .switch input:checked + span::before { transform: translateX(18px); }
-  .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; }
-  .photo { aspect-ratio: 1; border-radius: 10px; background: linear-gradient(145deg,#ffe091,#ff8298 52%,#806bff); }
-  .photo:nth-child(3n+2) { background: linear-gradient(145deg,#a1e4da,#499bc6 55%,#5863af); }
-  .photo:nth-child(3n) { background: linear-gradient(145deg,#d5b2ff,#ed99c2 55%,#ffcf8f); }
-  .note-editor { min-height: 55vh; background: white; font-size: 16px; line-height: 1.5; resize: vertical; }
-  .home-bar {
-    width: 125px;
-    height: 5px;
-    flex: 0 0 auto;
-    margin: 10px auto 9px;
-    border-radius: 5px;
-    background: #19191e;
-    cursor: pointer;
-  }
-  .card { padding: 22px; border-radius: 18px; background: white; text-align: center; }
-  .card-icon { font-size: 56px; }
-  .card h3 { margin: 8px 0; }
-  .card p { color: #777; }
+    .app {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 7px;
+      font-size: 11px;
+      cursor: pointer;
+    }
 
-  @media (max-height: 710px) {
-    .device-wrap { min-height: 0; }
-    .home { padding-top: 16px; }
-    .widgets { margin-bottom: 15px; }
-    .widget { min-height: 88px; }
-    .app-grid { gap: 12px 8px; }
-    .icon { width: 53px; height: 53px; font-size: 26px; }
-  }
-</style>
+    .app-icon {
+      width: 58px;
+      height: 58px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      font-size: 29px;
+      background: linear-gradient(145deg, #ffffff44, #ffffff18);
+      box-shadow: inset 0 1px 1px #ffffff55, 0 4px 12px #0002;
+      transition: transform 180ms ease;
+    }
+
+    .app:active .app-icon {
+      transform: scale(.88);
+    }
+
+    .settings-icon {
+      background: linear-gradient(145deg, #dce1e9, #737d8c);
+    }
+
+    .dock {
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-top: auto;
+      padding: 12px 8px;
+      border: 1px solid #ffffff20;
+      border-radius: 25px;
+      background: #ffffff28;
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+    }
+
+    .dock .app-icon {
+      width: 52px;
+      height: 52px;
+    }
+
+    .settings-screen {
+      z-index: 5;
+      padding: 58px 18px 38px;
+      overflow: hidden;
+      color: #16171b;
+      background: #f2f2f7;
+      transform: scale(var(--zoom-scale, .16));
+      transform-origin: var(--origin-x, 50%) var(--origin-y, 50%);
+      border-radius: 24px;
+      transition:
+        transform 480ms var(--ease-out),
+        border-radius 480ms var(--ease-out),
+        opacity 260ms ease,
+        visibility 0s linear 480ms;
+    }
+
+    .settings-screen.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transform: scale(1);
+      border-radius: 0;
+      transition:
+        transform 480ms var(--ease-out),
+        border-radius 480ms var(--ease-out),
+        opacity 220ms ease,
+        visibility 0s;
+    }
+
+    .settings-screen.closing {
+      opacity: 0;
+      visibility: visible;
+      pointer-events: none;
+      transform: scale(var(--zoom-scale, .16));
+      border-radius: 24px;
+      transition:
+        transform 420ms var(--ease-in-out),
+        border-radius 420ms var(--ease-in-out),
+        opacity 360ms ease,
+        visibility 0s linear 420ms;
+    }
+
+    .settings-title {
+      margin: 10px 4px 20px;
+      font-size: 32px;
+      font-weight: 750;
+      letter-spacing: -.7px;
+    }
+
+    .profile-card,
+    .settings-list {
+      overflow: hidden;
+      border-radius: 16px;
+      background: #fff;
+    }
+
+    .profile-card {
+      display: flex;
+      align-items: center;
+      gap: 13px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+
+    .avatar {
+      width: 46px;
+      height: 46px;
+      display: grid;
+      place-items: center;
+      border-radius: 50%;
+      background: linear-gradient(140deg, #8ed0ff, #7867d9);
+      font-size: 22px;
+    }
+
+    .profile-name {
+      font-size: 16px;
+      font-weight: 650;
+    }
+
+    .profile-subtitle {
+      margin-top: 3px;
+      color: #777982;
+      font-size: 12px;
+    }
+
+    .setting-row {
+      min-height: 51px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 0 13px;
+      border-bottom: 1px solid #ececf0;
+      font-size: 14px;
+    }
+
+    .setting-row:last-child {
+      border-bottom: 0;
+    }
+
+    .setting-symbol {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      border-radius: 7px;
+      color: white;
+      background: #4387e8;
+      font-size: 14px;
+    }
+
+    .chevron {
+      margin-left: auto;
+      color: #a6a7ad;
+    }
+
+    .home-indicator {
+      position: absolute;
+      z-index: 30;
+      bottom: 4px;
+      left: 50%;
+      width: 120px;
+      height: 32px;
+      padding: 14px 0 10px;
+      transform: translateX(-50%);
+      background-clip: content-box;
+      background-color: white;
+      border-radius: 9px;
+      cursor: grab;
+      touch-action: none;
+      transition: opacity 220ms ease;
+    }
+
+    .settings-screen.active ~ .home-indicator {
+      background-color: #151515;
+    }
+
+    .lock-screen {
+      z-index: 10;
+      text-align: center;
+      padding-top: 105px;
+      background:
+        radial-gradient(ellipse at 50% 75%, #bd90ff77, transparent 48%),
+        linear-gradient(160deg, #182f55, #568bb8 56%, #25264e);
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(0);
+      transition:
+        transform 650ms var(--ease-in-out),
+        opacity 420ms ease,
+        visibility 0s linear 650ms;
+    }
+
+    .lock-screen.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+      transition:
+        transform 650ms var(--ease-out),
+        opacity 350ms ease,
+        visibility 0s;
+    }
+
+    .lock-screen.unlocking {
+      opacity: 0;
+      visibility: visible;
+      transform: translateY(-100%);
+      pointer-events: none;
+      transition:
+        transform 650ms var(--ease-in-out),
+        opacity 500ms ease,
+        visibility 0s linear 650ms;
+    }
+
+    .lock-date {
+      font-size: 17px;
+      opacity: .95;
+    }
+
+    .lock-clock {
+      margin-top: 8px;
+      font-size: 82px;
+      font-weight: 250;
+      letter-spacing: -4px;
+    }
+
+    .unlock-hint {
+      position: absolute;
+      bottom: 64px;
+      left: 0;
+      width: 100%;
+      font-size: 13px;
+      opacity: .85;
+      animation: hintPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes hintPulse {
+      0%, 100% { opacity: .55; transform: translateY(0); }
+      50% { opacity: 1; transform: translateY(-4px); }
+    }
+
+    .off-screen {
+      z-index: 15;
+      background: #000;
+    }
+
+    .off-screen.active {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    .power-button {
+      position: absolute;
+      z-index: 40;
+      top: 145px;
+      right: -9px;
+      width: 7px;
+      height: 76px;
+      border: 0;
+      border-radius: 0 5px 5px 0;
+      background: #747982;
+      cursor: pointer;
+    }
+
+    @media (max-height: 600px) {
+      .phone {
+        height: 96vh;
+      }
+
+      .app-grid {
+        margin-top: 25px;
+        gap: 14px 10px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: .01ms !important;
+        transition-duration: .01ms !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
-<div class="device-wrap">
-  <main class="phone" id="phone">
-    <div class="status">
-      <span id="statusTime">9:41</span>
-      <div class="island"></div>
-      <span class="status-right">●●●　◖　▰</span>
+  <main class="stage">
+    <div class="phone">
+      <button class="power-button" id="powerButton" aria-label="Power button"></button>
+
+      <div class="screen" id="phoneScreen">
+        <div class="wallpaper"></div>
+
+        <div class="status-bar" id="statusBar">
+          <span id="statusTime">9:41</span>
+          <span>●●● &nbsp; Wi-Fi &nbsp; ▰</span>
+        </div>
+        <div class="island"></div>
+
+        <section class="home-screen" id="homeScreen">
+          <div class="date" id="homeDate"></div>
+          <div class="home-clock" id="homeClock"></div>
+
+          <div class="app-grid">
+            <div class="app" id="openSettings">
+              <div class="app-icon settings-icon" id="settingsIcon">⚙️</div>
+              <span>Settings</span>
+            </div>
+            <div class="app"><div class="app-icon">📷</div><span>Camera</span></div>
+            <div class="app"><div class="app-icon">🗺️</div><span>Maps</span></div>
+            <div class="app"><div class="app-icon">🕒</div><span>Clock</span></div>
+            <div class="app"><div class="app-icon">📝</div><span>Notes</span></div>
+            <div class="app"><div class="app-icon">🌤️</div><span>Weather</span></div>
+            <div class="app"><div class="app-icon">🎵</div><span>Music</span></div>
+            <div class="app"><div class="app-icon">🧭</div><span>Compass</span></div>
+          </div>
+
+          <div class="dock">
+            <div class="app"><div class="app-icon">☎️</div></div>
+            <div class="app"><div class="app-icon">💬</div></div>
+            <div class="app"><div class="app-icon">🌐</div></div>
+            <div class="app"><div class="app-icon">🎧</div></div>
+          </div>
+        </section>
+
+        <section class="settings-screen" id="settingsScreen">
+          <div class="settings-title">Settings</div>
+
+          <div class="profile-card">
+            <div class="avatar">👤</div>
+            <div>
+              <div class="profile-name">My Phone</div>
+              <div class="profile-subtitle">Account and device settings</div>
+            </div>
+            <span class="chevron">›</span>
+          </div>
+
+          <div class="settings-list">
+            <div class="setting-row"><span class="setting-symbol">✈</span>Airplane Mode<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">◉</span>Wi-Fi<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">ᛒ</span>Bluetooth<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">▰</span>Mobile Service<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">🔔</span>Notifications<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">☼</span>Display &amp; Brightness<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">🔋</span>Battery<span class="chevron">›</span></div>
+            <div class="setting-row"><span class="setting-symbol">🔒</span>Privacy &amp; Security<span class="chevron">›</span></div>
+          </div>
+        </section>
+
+        <section class="lock-screen" id="lockScreen">
+          <div class="lock-date" id="lockDate"></div>
+          <div class="lock-clock" id="lockClock"></div>
+          <div class="unlock-hint">Swipe up anywhere to unlock</div>
+        </section>
+
+        <div class="off-screen" id="offScreen"></div>
+        <div class="home-indicator" id="homeIndicator" aria-label="Swipe up to close the app"></div>
+      </div>
     </div>
-
-    <section class="home" id="home">
-      <p class="date" id="homeDate"></p>
-      <h1 class="greeting">Good morning</h1>
-
-      <div class="widgets">
-        <div class="widget">
-          <span class="widget-label">MY LOCATION</span>
-          <div class="weather-main"><span class="temperature">72°</span><span class="weather-icon">☀️</span></div>
-          <span class="weather-detail">Sunny · H:76° L:61°</span>
-        </div>
-        <div class="widget calendar-widget">
-          <span class="widget-label">UP NEXT</span>
-          <span class="calendar-day" id="calendarDay"></span>
-          <span class="calendar-number" id="calendarNumber"></span>
-          <span class="calendar-event">Nothing scheduled</span>
-        </div>
-      </div>
-
-      <p class="section-label">Your apps</p>
-      <div class="app-grid" id="appGrid"></div>
-    </section>
-
-    <nav class="dock" id="dock"></nav>
-
-    <section class="app-screen" id="appScreen">
-      <header class="app-header">
-        <h2 id="appTitle">App</h2>
-        <button class="done" id="closeApp">Done</button>
-      </header>
-      <div class="app-content" id="appContent"></div>
-      <div class="home-bar" id="appHomeBar" title="Close app"></div>
-    </section>
-
-    <section class="lock-screen" id="lockScreen" aria-label="Lock screen">
-      <div class="lock-date" id="lockDate"></div>
-      <h1 class="lock-time" id="lockTime"></h1>
-      <div class="lock-widgets">
-        <div class="lock-widget"><small>WEATHER</small><strong>☀️ 72°</strong><small>Mostly sunny</small></div>
-        <div class="lock-widget"><small>CALENDAR</small><strong>Nothing</strong><small>up next</small></div>
-      </div>
-      <div class="lock-bottom">
-        <button class="round-control" aria-label="Flashlight">🔦</button>
-        <button class="round-control" aria-label="Camera">📷</button>
-      </div>
-      <div class="swipe-hint">Swipe up to unlock</div>
-    </section>
-
-    <section class="off-screen" id="offScreen">
-      <div class="off-symbol">◯</div>
-      <span>Screen off</span>
-    </section>
   </main>
 
-  <button class="power-button" id="powerButton" aria-label="Power button" title="Power"></button>
-</div>
+  <script>
+    const homeScreen = document.getElementById("homeScreen");
+    const settingsScreen = document.getElementById("settingsScreen");
+    const lockScreen = document.getElementById("lockScreen");
+    const offScreen = document.getElementById("offScreen");
+    const homeIndicator = document.getElementById("homeIndicator");
+    const powerButton = document.getElementById("powerButton");
+    const statusBar = document.getElementById("statusBar");
+    const phoneScreen = document.getElementById("phoneScreen");
+    const settingsIcon = document.getElementById("settingsIcon");
 
-<script>
-  const apps = [
-    ["Settings","⚙️","linear-gradient(145deg,#dce0e8,#838995)"],
-    ["Photos","🌈","linear-gradient(145deg,#fff,#f3dce5)"],
-    ["Notes","📝","linear-gradient(145deg,#fff7b3,#ffbf39)"],
-    ["Weather","🌤️","linear-gradient(145deg,#75deff,#4683eb)"],
-    ["Calendar","📅","linear-gradient(145deg,#fff,#e3e4eb)"],
-    ["Music","🎵","linear-gradient(145deg,#ff91b8,#df2866)"],
-    ["Calculator","🧮","linear-gradient(145deg,#555963,#202127)"],
-    ["Clock","⏰","linear-gradient(145deg,#41434b,#101116)"],
-    ["Maps","🗺️","linear-gradient(145deg,#b6edb7,#51b47f)"],
-    ["Files","📁","linear-gradient(145deg,#82d6ff,#3595e8)"],
-    ["Mail","✉️","linear-gradient(145deg,#7cc7ff,#2478eb)"],
-    ["Reminders","☑️","linear-gradient(145deg,#fff,#e4e5ec)"]
-  ];
+    let phoneIsOn = true;
+    let currentView = "home";
+    let gestureStart = null;
+    let closeTimer = null;
+    let unlockTimer = null;
 
-  const dockItems = [
-    ["Phone","📞","linear-gradient(145deg,#6ce0a0,#20ac70)"],
-    ["Safari","🧭","linear-gradient(145deg,#8de7ff,#3383eb)"],
-    ["Messages","💬","linear-gradient(145deg,#73ed9d,#26b85b)"],
-    apps[5]
-  ];
-
-  const grid = document.getElementById("appGrid");
-  const dock = document.getElementById("dock");
-  const appScreen = document.getElementById("appScreen");
-  const lockScreen = document.getElementById("lockScreen");
-  const offScreen = document.getElementById("offScreen");
-  const appContent = document.getElementById("appContent");
-  let isOn = true;
-  let currentApp = "";
-
-  function addApp(item, parent) {
-    const [name, icon, color] = item;
-    const button = document.createElement("button");
-    button.className = "app";
-    button.innerHTML = `<span class="icon" style="--color:${color}">${icon}</span>
-      <span class="app-name">${name}</span>`;
-    button.addEventListener("click", () => openApp(name, button));
-    parent.appendChild(button);
-  }
-
-  apps.forEach(item => addApp(item, grid));
-  dockItems.forEach(item => addApp(item, dock));
-
-  function openApp(name, button) {
-    if (!isOn) return;
-    currentApp = name;
-    document.getElementById("appTitle").textContent = name;
-
-    const phoneRect = document.getElementById("phone").getBoundingClientRect();
-    const iconRect = button.querySelector(".icon").getBoundingClientRect();
-    const x = iconRect.left + iconRect.width / 2 - phoneRect.left;
-    const y = iconRect.top + iconRect.height / 2 - phoneRect.top;
-    appScreen.style.setProperty("--origin-x", `${x}px`);
-    appScreen.style.setProperty("--origin-y", `${y}px`);
-
-    renderApp(name);
-    appScreen.classList.add("visible");
-  }
-
-  function closeApp() {
-    appScreen.classList.remove("visible");
-  }
-  document.getElementById("closeApp").addEventListener("click", closeApp);
-  document.getElementById("appHomeBar").addEventListener("click", closeApp);
-
-  function togglePower() {
-    if (isOn) {
-      isOn = false;
-      appScreen.classList.remove("visible");
-      lockScreen.classList.remove("visible");
-      offScreen.classList.add("visible");
-    } else {
-      isOn = true;
-      offScreen.classList.remove("visible");
-      lockScreen.classList.add("visible");
-    }
-  }
-  document.getElementById("powerButton").addEventListener("click", togglePower);
-
-  // Swipe upward anywhere on the lock screen to reach Home.
-  let touchStartY = null;
-  lockScreen.addEventListener("touchstart", event => {
-    touchStartY = event.touches[0].clientY;
-  }, {passive: true});
-  lockScreen.addEventListener("touchend", event => {
-    if (touchStartY !== null && touchStartY - event.changedTouches[0].clientY > 35) {
-      lockScreen.classList.remove("visible");
-    }
-    touchStartY = null;
-  }, {passive: true});
-
-  // Also supports a mouse drag for desktop testing.
-  let mouseStartY = null;
-  lockScreen.addEventListener("pointerdown", event => { mouseStartY = event.clientY; });
-  lockScreen.addEventListener("pointerup", event => {
-    if (mouseStartY !== null && mouseStartY - event.clientY > 45) {
-      lockScreen.classList.remove("visible");
-    }
-    mouseStartY = null;
-  });
-
-  document.addEventListener("keydown", event => {
-    if (event.key === "Escape") closeApp();
-  });
-
-  function row(icon, label, right = '<span style="color:#aaa">›</span>') {
-    return `<div class="row"><span class="row-left"><span class="row-icon">${icon}</span>${label}</span>${right}</div>`;
-  }
-  function toggleRow(icon, label, checked) {
-    return `<div class="row"><span class="row-left"><span class="row-icon">${icon}</span>${label}</span>
-      <label class="switch"><input type="checkbox" ${checked ? "checked" : ""}><span></span></label></div>`;
-  }
-
-  function renderApp(name) {
-    if (name === "Settings") {
-      appContent.innerHTML = `
-        <input class="search" id="settingSearch" placeholder="⌕  Search Settings">
-        <div id="settingRows">
-          <div class="group">${row("👤","Apple Account")}</div>
-          <p class="group-title">CONNECTIVITY</p>
-          <div class="group">
-            ${toggleRow("✈️","Airplane Mode",false)}
-            ${toggleRow("⌁","Wi-Fi",true)}
-            ${toggleRow("ᛒ","Bluetooth",true)}
-            ${toggleRow("◉","Cellular",true)}
-          </div>
-          <p class="group-title">PREFERENCES</p>
-          <div class="group">
-            ${toggleRow("🌙","Focus",false)}
-            ${toggleRow("🔔","Notifications",true)}
-            ${row("🖥️","Display & Brightness")}
-            ${row("🔒","Privacy & Security")}
-            ${row("⚙️","General")}
-          </div>
-        </div>`;
-      document.getElementById("settingSearch").addEventListener("input", event => {
-        const query = event.target.value.toLowerCase();
-        document.querySelectorAll("#settingRows .row").forEach(r => {
-          r.style.display = r.textContent.toLowerCase().includes(query) ? "" : "none";
-        });
-      });
-    } else if (name === "Photos") {
-      appContent.innerHTML = `<p class="group-title">RECENTS</p><div class="photo-grid">${
-        Array.from({length: 18}, (_, i) => `<div class="photo" style="filter:hue-rotate(${i * 17}deg)"></div>`).join("")
-      }</div>`;
-    } else if (name === "Notes") {
-      appContent.innerHTML = `<textarea class="note-editor" id="note" placeholder="Start writing..."></textarea>
-        <p style="color:#888;font-size:12px">Notes save automatically on this device.</p>`;
-      const note = document.getElementById("note");
-      note.value = localStorage.getItem("demoNote") || "";
-      note.addEventListener("input", () => localStorage.setItem("demoNote", note.value));
-    } else if (name === "Settings") {
-      appContent.innerHTML = `<div class="card">Settings</div>`;
-    } else if (name === "Weather") {
-      appContent.innerHTML = `<div class="card" style="color:white;background:linear-gradient(145deg,#4aa9ed,#7778dc)">
-        <div class="card-icon">☀️</div><div style="font-size:60px;font-weight:300">72°</div>
-        <div>Sunny</div><p>High 76° · Low 61°</p></div>
-        <div class="group" style="margin-top:14px">${row("🌬️","Wind","5 mph")}${row("💧","Humidity","42%")}</div>`;
-    } else if (name === "Calendar") {
+    function updateClock() {
       const now = new Date();
-      appContent.innerHTML = `<div class="card"><div style="color:#ef4d58;font-weight:700">${now.toLocaleDateString([], {weekday:"long",month:"long"})}</div>
-        <div style="font-size:76px;font-weight:300">${now.getDate()}</div><p>Nothing scheduled today</p></div>`;
-    } else if (name === "Music") {
-      appContent.innerHTML = `<div class="card"><div class="card-icon">🎧</div><h3>Good Vibes</h3><p>Chill Mix · Your Library</p>
-        <input type="range" value="35" style="width:100%;accent-color:#fa2d55">
-        <button id="play" style="border:0;background:none;font-size:38px">▶</button></div>`;
-      document.getElementById("play").addEventListener("click", event =>
-        event.currentTarget.textContent = event.currentTarget.textContent === "▶" ? "Ⅱ" : "▶");
-    } else if (name === "Calculator") {
-      appContent.innerHTML = `<div class="card"><div id="calcDisplay" style="font-size:48px;text-align:right">0</div>
-        <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px">
-        ${["AC","±","%","÷","7","8","9","×","4","5","6","−","1","2","3","+","0",".","⌫","="].map(k =>
-          `<button class="calcKey" data-k="${k}" style="aspect-ratio:1;border:0;border-radius:50%;background:${["÷","×","−","+","="].includes(k)?"#ff9f0a":"#e5e5eb"};font-size:20px">${k}</button>`
-        ).join("")}</div></div>`;
-      setupCalc();
-    } else if (name === "Clock") {
-      appContent.innerHTML = `<div class="card"><div id="bigClock" style="font-size:58px;font-weight:300"></div><p id="bigDate"></p></div>
-        <div class="group" style="margin-top:14px">${row("⏱️","World Clock")}${row("⏰","Alarm")}${row("⏲️","Timer")}${row("⏳","Stopwatch")}</div>`;
-    } else {
-      const icons = {Maps:"🗺️", Files:"📁", Mail:"✉️", Reminders:"☑️", Phone:"📞", Safari:"🧭", Messages:"💬"};
-      appContent.innerHTML = `<div class="card"><div class="card-icon">${icons[name] || "✨"}</div>
-        <h3>${name}</h3><p>This app is ready.</p></div>`;
+      const time = now.toLocaleTimeString([], {
+        hour: "numeric",
+        minute: "2-digit"
+      });
+      const date = now.toLocaleDateString([], {
+        weekday: "long",
+        month: "long",
+        day: "numeric"
+      });
+
+      document.getElementById("homeClock").textContent = time;
+      document.getElementById("lockClock").textContent = time;
+      document.getElementById("statusTime").textContent = time;
+      document.getElementById("homeDate").textContent = date;
+      document.getElementById("lockDate").textContent = date;
     }
-  }
 
-  let calc = "0", stored = null, operator = null, newEntry = false;
-  function setupCalc() {
-    document.querySelectorAll(".calcKey").forEach(button => button.addEventListener("click", () => {
-      const k = button.dataset.k;
-      if (k === "AC") { calc = "0"; stored = null; operator = null; }
-      else if (k === "⌫") calc = calc.length > 1 ? calc.slice(0, -1) : "0";
-      else if (k === ".") { if (!calc.includes(".")) calc += "."; }
-      else if (["÷","×","−","+"].includes(k)) { stored = Number(calc); operator = k; newEntry = true; }
-      else if (k === "=" && operator) {
-        const b = Number(calc);
-        const value = operator === "+" ? stored + b : operator === "−" ? stored - b :
-          operator === "×" ? stored * b : b === 0 ? "Error" : stored / b;
-        calc = String(Number.isFinite(value) ? Number(value.toFixed(8)) : value);
-        operator = null; newEntry = true;
-      } else if (k === "±") calc = String(Number(calc) * -1);
-      else if (k === "%") calc = String(Number(calc) / 100);
-      else if (!isNaN(Number(k))) {
-        calc = newEntry || calc === "0" ? k : calc + k;
-        newEntry = false;
+    function showHome() {
+      clearTimeout(closeTimer);
+      clearTimeout(unlockTimer);
+
+      currentView = "home";
+      settingsScreen.classList.remove("active", "closing");
+      lockScreen.classList.remove("active", "unlocking");
+      offScreen.classList.remove("active");
+      homeScreen.classList.remove("apps-dimmed");
+      statusBar.style.opacity = "1";
+      homeIndicator.style.display = "block";
+    }
+
+    function openSettings() {
+      if (!phoneIsOn || currentView !== "home") return;
+
+      const iconRect = settingsIcon.getBoundingClientRect();
+      const screenRect = phoneScreen.getBoundingClientRect();
+
+      const x = iconRect.left + iconRect.width / 2 - screenRect.left;
+      const y = iconRect.top + iconRect.height / 2 - screenRect.top;
+      const scale = Math.max(
+        iconRect.width / screenRect.width,
+        iconRect.height / screenRect.height
+      );
+
+      settingsScreen.style.setProperty("--origin-x", x + "px");
+      settingsScreen.style.setProperty("--origin-y", y + "px");
+      settingsScreen.style.setProperty("--zoom-scale", scale);
+      settingsScreen.style.transformOrigin = `${x}px ${y}px`;
+
+      currentView = "settings";
+      homeScreen.classList.add("apps-dimmed");
+      settingsScreen.classList.remove("closing");
+      settingsScreen.classList.add("active");
+      homeIndicator.style.display = "block";
+    }
+
+    function closeSettings() {
+      if (currentView !== "settings") return;
+
+      currentView = "home";
+      settingsScreen.classList.add("closing");
+      settingsScreen.classList.remove("active");
+      homeScreen.classList.remove("apps-dimmed");
+
+      closeTimer = setTimeout(() => {
+        settingsScreen.classList.remove("closing");
+      }, 430);
+    }
+
+    function unlockPhone() {
+      if (currentView !== "lock") return;
+
+      currentView = "unlocking";
+      lockScreen.classList.add("unlocking");
+      homeScreen.classList.remove("apps-dimmed");
+      statusBar.style.opacity = "1";
+
+      unlockTimer = setTimeout(() => {
+        lockScreen.classList.remove("active", "unlocking");
+        currentView = "home";
+      }, 620);
+    }
+
+    document.getElementById("openSettings").addEventListener("click", openSettings);
+
+    powerButton.addEventListener("click", () => {
+      if (phoneIsOn) {
+        phoneIsOn = false;
+        currentView = "off";
+        homeScreen.classList.remove("apps-dimmed");
+        settingsScreen.classList.remove("active", "closing");
+        lockScreen.classList.remove("active", "unlocking");
+        offScreen.classList.add("active");
+        statusBar.style.opacity = "0";
+        homeIndicator.style.display = "none";
+      } else {
+        phoneIsOn = true;
+        currentView = "lock";
+        offScreen.classList.remove("active");
+        lockScreen.classList.add("active");
+        statusBar.style.opacity = "1";
+        homeIndicator.style.display = "none";
       }
-      document.getElementById("calcDisplay").textContent = calc;
-    }));
-  }
+    });
 
-  function updateClock() {
-    const now = new Date();
-    const time = now.toLocaleTimeString([], {hour:"numeric", minute:"2-digit"});
-    document.getElementById("statusTime").textContent = time;
-    document.getElementById("lockTime").textContent = time;
-    document.getElementById("homeDate").textContent =
-      now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
-    document.getElementById("lockDate").textContent =
-      now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
-    document.getElementById("calendarDay").textContent =
-      now.toLocaleDateString([], {weekday:"long"}).toUpperCase();
-    document.getElementById("calendarNumber").textContent = now.getDate();
-    const bigClock = document.getElementById("bigClock");
-    const bigDate = document.getElementById("bigDate");
-    if (bigClock) bigClock.textContent = time;
-    if (bigDate) bigDate.textContent = now.toLocaleDateString([], {weekday:"long", month:"long", day:"numeric"});
-  }
+    function startGesture(event, fromIndicator) {
+      if (!phoneIsOn) return;
 
-  updateClock();
-  setInterval(updateClock, 1000);
-</script>
+      gestureStart = {
+        x: event.clientX,
+        y: event.clientY,
+        fromIndicator: fromIndicator
+      };
+
+      if (event.currentTarget.setPointerCapture) {
+        event.currentTarget.setPointerCapture(event.pointerId);
+      }
+    }
+
+    function endGesture(event) {
+      if (!gestureStart || !phoneIsOn) return;
+
+      const swipeUp = gestureStart.y - event.clientY > 35;
+      const mostlyVertical = Math.abs(gestureStart.x - event.clientX) < 110;
+
+      if (swipeUp && mostlyVertical) {
+        if (currentView === "lock") {
+          unlockPhone();
+        } else if (
+          currentView === "settings" &&
+          gestureStart.fromIndicator
+        ) {
+          closeSettings();
+        }
+      }
+
+      gestureStart = null;
+    }
+
+    homeIndicator.addEventListener("pointerdown", event => {
+      startGesture(event, true);
+    });
+    homeIndicator.addEventListener("pointerup", endGesture);
+    homeIndicator.addEventListener("pointercancel", () => {
+      gestureStart = null;
+    });
+
+    lockScreen.addEventListener("pointerdown", event => {
+      startGesture(event, false);
+    });
+    lockScreen.addEventListener("pointerup", endGesture);
+    lockScreen.addEventListener("pointercancel", () => {
+      gestureStart = null;
+    });
+
+    document.addEventListener("contextmenu", event => event.preventDefault());
+    document.addEventListener("dblclick", event => event.preventDefault());
+    document.addEventListener("touchmove", event => event.preventDefault(), {
+      passive: false
+    });
+    document.addEventListener("wheel", event => event.preventDefault(), {
+      passive: false
+    });
+
+    updateClock();
+    setInterval(updateClock, 1000);
+  </script>
 </body>
 </html>
